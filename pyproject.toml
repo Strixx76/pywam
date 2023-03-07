@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pywam"
+version = "0.0.1"
+description = "Library built on AsyncIO for communicating with Samsung Wireless Audio speakers (WAM)."
+license = { text = "MIT License" }
+readme = "README.md"
+authors = [
+    { name="Daniel Jönsson" },
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+	"Framework :: AsyncIO",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Typing :: Typed",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+]
+
+[project.urls]
+"Homepage" = "https://www.github.com/Strixx76/pywam"
