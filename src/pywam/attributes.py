@@ -319,14 +319,14 @@ class WamAttributes:
     @ property
     def is_master(self) -> bool | None:
         """ True if the speaker is master in a group. """
-        if not self._mute:
+        if not self._grouptype:
             return None
         return (self._grouptype == 'M')
 
     @ property
     def is_slave(self) -> bool | None:
         """ True if the speaker is slave in a group. """
-        if not self._mute:
+        if not self._grouptype:
             return None
         return (self._grouptype == 'S')
 
