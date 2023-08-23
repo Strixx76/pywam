@@ -38,6 +38,7 @@ class ApiCall:
     __slots__ = ('api_type', 'method', 'args', 'pwron', 'expected_response',
                  'user_check', 'timeout_multiple')
 
+    # pylint: disable=dangerous-default-value
     def __init__(self,
                  api_type: str,
                  method: str,
@@ -753,6 +754,7 @@ def get_7band_eq_list() -> ApiCall:
                    pwron=False,
                    method='Get7BandEQList',
                    args=[],
+                   # TODO: Expected response
                    expected_response='',
                    user_check=False,
                    timeout_multiple=1,
@@ -901,6 +903,7 @@ def get_current_radio_list(startindex: int, listcount: int) -> ApiCall:
                    args=[('startindex', startindex, 'dec'),
                          ('listcount', listcount, 'dec'),
                          ],
+                   # TODO: Expected response
                    expected_response='',
                    user_check=True,
                    timeout_multiple=1,
@@ -926,6 +929,7 @@ def get_select_radio_list(contentid: int, startindex: int, listcount: int) -> Ap
                          ('startindex', startindex, 'dec'),
                          ('listcount', listcount, 'dec'),
                          ],
+                   # TODO: Expected response
                    expected_response='',
                    user_check=False,
                    timeout_multiple=1,
@@ -952,6 +956,7 @@ def set_play_select(select_item_ids: int | list[int]) -> ApiCall:
                    pwron=False,
                    method='SetPlaySelect',
                    args=[(method, select_item_ids, arg_type)],
+                   # TODO: Expected response
                    expected_response='',
                    user_check=False,
                    timeout_multiple=1,

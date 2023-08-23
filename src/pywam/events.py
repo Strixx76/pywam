@@ -2,6 +2,10 @@
 # Copyright (c) Daniel Jönsson. All rights reserved.
 # Licensed under the MIT License. See LICENSE.txt in project root.
 
+# pylint: disable=W0212:protected-access
+# pylint: disable=W0613:unused-argument
+# pylint: disable=C0103:invalid-name
+# pylint: disable=C0302:too-many-lines
 """ Checking for state/attribute changes. """
 from __future__ import annotations
 
@@ -83,7 +87,7 @@ class WamEvents:
                     if info_level == 0:
                         subscriber()
                     self._latest_known_state = new
-            except Exception:
+            except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception('Could not dispatch event from speaker')
 
     def register_subscriber(self,
@@ -126,8 +130,8 @@ class WamEvents:
         """
         try:
             del self._subscriber[callback]
-        except KeyError:
-            raise KeyError(f'{callback} is not a registered subscriber.')
+        except KeyError as e:
+            raise KeyError(f'{callback} is not a registered subscriber.') from e
 
     # ******************************************************************
     # Speaker events
@@ -1756,7 +1760,7 @@ class WamEvents:
         return False
 
     def event_ShuffleMode(self, event: 'ApiResponse') -> bool:
-        """ Shuffel mode.
+        """ Shuffle mode.
 
         method (str): 'ShuffleMode'
         type: (str): 'UIC'
@@ -1862,7 +1866,7 @@ class WamEvents:
     def event_SpkName(self, event: 'ApiResponse') -> bool:
         """ Speaker name.
 
-        Sent when speakername is asked for (´GetSpkName´)
+        Sent when speaker name is asked for (´GetSpkName´)
         or changed (´SetSpkName´).
 
         method (str): 'SpkName'
