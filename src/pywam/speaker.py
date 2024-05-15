@@ -102,7 +102,7 @@ class Speaker():
 
         # If we don't know all the needed attributes, nothing is supported.
         if self.attribute._grouptype is None or self.attribute._function is None:
-            raise PywamError('Speaker state is unknown. First call must be Speaker.update().')
+            return []
 
         # If speaker is slave in group only basic features are supported.
         if self.attribute.is_slave:

@@ -12,3 +12,7 @@ class FeatureNotSupportedError(PywamError):
 
 class ApiCallError(PywamError):
     """ Api call was not successful. """
+
+
+class ApiCallTimeoutError(PywamError):
+    """ Api call response time out. """
