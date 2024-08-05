@@ -12,6 +12,7 @@ import uuid
 from pywam.lib.const import SPEAKER_MODELS
 from pywam.lib.equalizer import EqualizerPreset, EqualizerValues
 from pywam.lib.media_presets import MediaPreset
+from pywam.lib.url import UrlMediaItem
 
 if TYPE_CHECKING:
     from pywam.speaker import Speaker
