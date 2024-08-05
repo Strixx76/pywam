@@ -1,5 +1,7 @@
 # pywam
 
+[![PyPi Downloads][pypibadge]][pypilink]
+
 pywam is an fast and lightweight python asyncio library without external dependencies for communicating with Samsung Wireless Audio (R) speakers (WAM). It was developed to be used for integrating the speakers in Home Assistant.
 
 ## Features
@@ -90,3 +92,5 @@ This project would not have been possible without, but not limited to, the follo
 
 [coffeelink]: https://www.buymeacoffee.com/76strixx
 [coffeebadge]: https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png
+[pypibadge]: https://img.shields.io/pypi/dm/pywam?label=PyPi%20Downloads
+[pypilink]: https://pypi.org/project/pywam/
