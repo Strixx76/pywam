@@ -353,7 +353,7 @@ class WamAttributes:
     @ property
     def volume(self) -> int | None:
         """ Return volume level (0-100). """
-        if self._volume:
+        if self._volume is not None:
             return translate.decode_volume(int(self._volume))
         return None
 
