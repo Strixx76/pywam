@@ -294,6 +294,25 @@ def source(source: str, model: str | None) -> str:
     return source
 
 
+def url_media_item(item: UrlMediaItem) -> UrlMediaItem:
+    """ Validate url media items.
+
+    Arguments:
+        item:
+            UrlMediaItem to validate.
+
+    Returns:
+        Validated value.
+
+    Raises:
+        TypeError:
+            If not a UrlMediaItem object.
+    """
+    if not isinstance(item, UrlMediaItem):
+        raise TypeError('Must be a UrlMediaItem object.')
+    return item
+
+
 def user(user: str) -> str:
     """ Validate UUID.
 

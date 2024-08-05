@@ -21,6 +21,7 @@ from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError, PywamEr
 if TYPE_CHECKING:
     from pywam.lib.api_response import ApiResponse
     from pywam.lib.media_presets import MediaPreset
+    from pywam.lib.url import UrlMediaItem
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -213,6 +214,48 @@ class Speaker():
         preset_index = int(preset.contentid)
 
         await self.client.request(api_call.set_play_preset(preset_type, preset_index))
+
+    @is_it_supported
+    async def play_url(self, item: UrlMediaItem) -> None:
+        """ Play from url.
+
+        Plays a audio stream from an URL. Supported file formats:
+        AAC (No DRM), MP3 (max 320kbps), OGG, WMA/WMV (1/2/3/7/9),
+        WAV/FLAC/ALAC/AIFF (max 192kHz/24bit).
+        NB! The speaker tries to play the body of the request no matter
+        what it contains, and does no checking. If the file or body is
+        not playable the speaker sometimes freezes, and you will have to
+        unplug it to get it to respond again.
+        The speaker sends no attributes when an url is played, so it is
+        up to the user to set attributes using the UrlMediaItem.
+
+        Arguments:
+            item:
+                UrlMediaItem with information about the url.
+        """
+        # Some speakers does't support the SetUrlPlayback API.
+        # Maybe it depends on firmware version? We are not checking at
+        # the moment.
+        # https://sites.google.com/view/samsungwirelessaudiomultiroom/firmware
+
+        item = validate.url_media_item(item)
+
+        # Play url with 2Mb buffer size = 2097152
+        result = await self.client.request(api_call.set_url_playback(item.url, 2097152, 0, 0))
+
+        # *****************************************************
+        # Workaround to set attributes not sent by the speaker.
+        # *****************************************************
+        if result.success:
+            self.attribute._title = item.title
+            self.attribute._description = item.description
+            self.attribute._tracklength = item.duration
+            self.attribute._thumbnail = item.thumbnail
+
+        # We need to call all event subscribers after we have manually
+        # set new attributes, otherwise the user will not be notified of
+        # the change.
+        self.events._dispatch_event(True, result)
 
     # ******************************************************************
     # Set
