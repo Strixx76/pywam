@@ -44,7 +44,7 @@ class WamEvents:
             event:
                 ApiResponse object with information about the event.
         """
-        _LOGGER.debug('Event handler received an event')
+        _LOGGER.debug('(%s) Event handler received an event', self._speaker.ip)
         _LOGGER.debug('Event: %s', event)
 
         # Don't do anything with unsuccessful responses. Empty events
@@ -55,7 +55,7 @@ class WamEvents:
         # Call corresponding method for events from speaker.
         event_method = getattr(self, 'event_' + event.method, None)
         if not event_method:
-            _LOGGER.info('Event handler received an unknown event.')
+            _LOGGER.info('(%s) Event handler received an unknown event', self._speaker.ip)
             _LOGGER.info('Event: %s', event)
             return
         used = event_method(event)
@@ -89,7 +89,7 @@ class WamEvents:
                         subscriber()
                     self._latest_known_state = new
             except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception('Could not dispatch event from speaker')
+                _LOGGER.exception('(%s) Could not dispatch event from speaker', self._speaker.ip)
 
     def register_subscriber(self,
                             callback: Callable[[], Any] | Callable[[dict], Any],

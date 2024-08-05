@@ -147,6 +147,7 @@ class WamClient:
                 self._event_writer.close()
                 await self._event_writer.wait_closed()
             except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception('(%s) Unhandled exception when disconnecting', self._ip)
 
         self._event_reader = None
         self._event_writer = None
@@ -162,7 +163,8 @@ class WamClient:
             except asyncio.CancelledError:
                 pass
             except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception('Unhandled exception when canceling listener task.')
+                _LOGGER.exception('(%s) Unhandled exception when canceling listener task',
+                                  self._ip)
             finally:
                 self._listener_task = None
         self._listening.clear()
@@ -287,7 +289,7 @@ class WamClient:
             api_response = api_decode(http_response.body)
         except Exception as e:  # pylint: disable=broad-except
             api_response = api_error('ApiDecodingError', e, http_response.body)
-            _LOGGER.warning('Error when decoding api response')
+            _LOGGER.warning('(%s) Error when decoding api response', self._ip)
         self._dispatch_event(api_response)
         await self._return_response(api_response)
 
@@ -345,7 +347,7 @@ class WamClient:
             try:
                 subscriber(api_response)
             except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception('Error when trying to dispatch an event')
+                _LOGGER.exception('(%s) Error when trying to dispatch an event', self._ip)
 
     def register_subscriber(self, callback: Callable[['ApiResponse'], Any]) -> None:
         """ Register a function for receiving events from speaker.
