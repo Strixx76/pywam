@@ -15,6 +15,7 @@ from pywam.lib.media_presets import MediaPreset
 
 if TYPE_CHECKING:
     from datetime import datetime
+    from pywam.speaker import Speaker
 
 
 class WamAttributes:
@@ -139,7 +140,9 @@ class WamAttributes:
             Timestamp when speaker was last heard from.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, speaker: Speaker) -> None:
+
+        self._speaker = speaker
 
         # UNMODIFIED WAM ATTRIBUTES
         # Speaker attributes

@@ -66,12 +66,9 @@ class Speaker():
         self._ip: str = validate.ip(ip)
         self._port: int = validate.port(port)
         self._user: str = validate.user(user)
-        self._stay_connected_task: asyncio.Task | None = None
-        self._connection_attempts: int = 0
-        self.attribute = WamAttributes()
-        self.events = WamEvents(self.attribute)
-        self.client = WamClient(self._ip, self._port, self._user)
-        self.client.register_subscriber(self.events.receiver)
+        self.attribute = WamAttributes(self)
+        self.events = WamEvents(self)
+        self.client = WamClient(self)
 
     async def __aenter__(self):
         await self.connect()

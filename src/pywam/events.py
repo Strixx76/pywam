@@ -17,8 +17,8 @@ from pywam.lib.validate import is_integer
 from pywam.lib.helpers import listify
 
 if TYPE_CHECKING:
-    from pywam.attributes import WamAttributes
     from pywam.lib.api_response import ApiResponse
+    from pywam.speaker import Speaker
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,8 +31,9 @@ class WamEvents:
             WamAttributes object shared with Speaker object.
     """
 
-    def __init__(self, attributes: 'WamAttributes'):
-        self._attr = attributes
+    def __init__(self, speaker: Speaker):
+        self._attr = speaker.attribute
+        self._speaker = speaker
         self._subscriber: dict[Callable, int] = {}
         self._latest_known_state: dict = self._attr.get_state_copy()
 

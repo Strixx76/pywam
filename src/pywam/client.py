@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from pywam.lib.api_call import ApiCall
     from pywam.lib.api_response import ApiResponse
     from pywam.lib.http import HttpResponse
+    from pywam.speaker import Speaker
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -44,10 +45,10 @@ class WamClient:
             UUID for the connected user.
     """
 
-    def __init__(self, ip: str, port: int, user: str) -> None:
-        self._ip = ip
-        self._port = port
-        self._user = user
+    def __init__(self, speaker: Speaker) -> None:
+        self._ip = speaker.ip
+        self._port = speaker.port
+        self._user = speaker.user
         # Socket
         self._connection_timeout: int = 5
         self._event_reader: asyncio.StreamReader | None = None
