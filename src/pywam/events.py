@@ -1154,7 +1154,7 @@ class WamEvents:
         return False
 
     def event_MultispkGroup(self, event: 'ApiResponse') -> bool:
-        """ ????.
+        """ Information about multi speaker groups.
 
         method (str): 'MultispkGroup'
         type: (str): 'UIC'
@@ -1163,28 +1163,50 @@ class WamEvents:
         user_identifier (str): 'public'
 
         response (dict):
-            @result(str): 'ok' | 'ng'
+            @result(str):
+                'ok' | 'ng'
             audiosourcemacaddr(str, optional):
+                [Master]
             audiosourcename(str, optional):
+                [Master]
             audiosourcetype(str, optional):
+                [Master]
             groupindex(str):
+                [Slave][Master] ?
             groupmainip(str, optional):
+                [Slave] Master speaker IP if slave otherwise left out.
+                Also received in 'MainInfo' but then the master has its own IP,
+                or '0.0.0.0' if not grouped.
             groupmainmacaddr(str, optional):
-            groupname(str):
+                [Slave] Master speaker MAC if slave otherwise left out.
+                Also received in 'MainInfo' but then the master has its own MAC,
+                or '00:00:00:00:00:00' if not grouped.
+            groupname(str | None):
+                [Slave][Master] None for slaves?
+                Also received in 'GroupName'
             grouptype(str):
+                [Slave][Master] S= Slave, M= Master
             spknum(str):
+                [Slave][Master] Number of speakers in the group
+                Also received in 'MainInfo' but then the attribute
+                is called: 'groupspknum'.
             subspklist(dict, optional):
+                [Master]
+                List of subspeakers. Only sent by master in the group.
+                List if more than one subspeaker
                 subspk(list | dict):
                         @index(str):
+                            Index in list
                         subspkip(str):
+                            IP of subspeaker
                         subspkmacaddr(str):
-                    @index(str):
-                    subspkip(str):
-                    subspkmacaddr(str):
+                            MAC of subspeaker
             subspklistcount(str, optional):
+                [Master] Number of subspeakers
         """
         self._attr._groupmainip = event.get_key('groupmainip')
         self._attr._groupmainmacaddr = event.get_key('groupmainmacaddr')
+        # Attribute spknum is called groupspknum in MainInfo so we use that instead
         self._attr._groupspknum = event.get_key('spknum')
         self._attr._grouptype = event.get_key('grouptype')
         self._attr._groupname = event.get_key('groupname')
@@ -1982,9 +2004,9 @@ class WamEvents:
         """
         self._attr._groupmainip = '0.0.0.0'
         self._attr._groupmainmacaddr = '00:00:00:00:00:00'
-        self._attr._groupspknum = '0'
+        self._attr._groupspknum = '1'
         self._attr._grouptype = 'N'
-        self._attr._groupname = None
+        self._attr._groupname = ''
 
         return True
 

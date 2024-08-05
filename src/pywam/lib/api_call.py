@@ -669,7 +669,7 @@ def set_multispk_group_mainspk(name: str,
                    args=args,  # type: ignore
                    expected_response='MultispkGroup',
                    user_check=False,
-                   timeout_multiple=2,
+                   timeout_multiple=3,
                    )
 
 
@@ -716,7 +716,7 @@ def set_multispk_group_subspk(name: str,
                          ],
                    expected_response='MultispkGroup',
                    user_check=False,
-                   timeout_multiple=2,
+                   timeout_multiple=3,
                    )
 
 

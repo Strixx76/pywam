@@ -49,16 +49,23 @@ class WamAttributes:
         _iptable:
             List of all connected clients.
         _groupmainip:
-            Master speaker IP when grouped (otherwise '0.0.0.0').
+            Master speaker IP when grouped.
+            '0.0.0.0' if not grouped is returned by MainInfo.
+            Will be None if speaker is Master but returned from MultispkGroup-event.
+            Will be own IP if speaker is Master and returned from MainInfo-event.
         _groupmainmacaddr:
             Master speaker MAC when grouped
-            (otherwise '00:00:00:00:00:00').
+            '0.0.0.0' if not grouped is returned by MainInfo.
+            Will be None if speaker is Master but returned from MultispkGroup-event.
+            Will be own MAC if speaker is Master and returned from MainInfo-event.
         _groupspknum:
             Total number of speakers in the group.
+            Called spknum in MultispkGroup events but stored here.
         _grouptype:
             'M'|'S'|'N' = Master, Slave, None (if not in group).
         _groupname:
-            Name of speaker group or 'None'.
+            Name of speaker group or 'None'. If received by MultispkGroup-event
+            slaves will not know the groupname and GetGroupName-call must be sent.
         _volume:
             Speaker volume between 0 and 30.
         _mute:
@@ -316,6 +323,18 @@ class WamAttributes:
             clients[client.get('ip', 'unknown')] = client.get('@uuid', '')
         return clients
 
+    @property
+    def is_grouped(self) -> bool | None:
+        """ True if the speaker is grouped. """
+        if self._groupspknum is None or self._grouptype is None:
+            return None
+        if self._groupspknum == '1':
+            return False
+        if self._grouptype == 'N':
+            return False
+
+        return True
+
     @ property
     def is_master(self) -> bool | None:
         """ True if the speaker is master in a group. """
@@ -337,18 +356,28 @@ class WamAttributes:
 
     @ property
     def master_ip(self) -> str | None:
-        """ Returns masters IP address if speaker is grouped. """
-        return self._groupmainip
+        """ Returns masters IP address if slave and grouped.. """
+        # When master it could either be own IP or None depending on
+        # last received event
+        if self.is_slave:
+            return self._groupmainip
+        return None
 
     @ property
     def master_mac(self) -> str | None:
         """ Returns masters MAC address if speaker is grouped. """
-        return self._groupmainip
+        # When master it could either be own MAC or None depending on
+        # last received event
+        if self.is_slave:
+            return self._groupmainmacaddr
+        return None
 
     @ property
-    def number_of_speakers(self) -> str | None:
+    def number_of_speakers(self) -> int | None:
         """ Returns number of speakers in group if grouped. """
-        return self._groupspknum
+        if self._groupspknum is not None:
+            return int(self._groupspknum)
+        return None
 
     @ property
     def volume(self) -> int | None:
