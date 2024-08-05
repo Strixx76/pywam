@@ -4,7 +4,7 @@ pywam is an fast and lightweight python asyncio library without external depende
 
 ## Features
 
-- Controll Samasung Multiroom speakers.
+- Control Samsung Multiroom speakers.
 - Keep track of the state of Samsung Multiroom speakers.
 
 ## Installation

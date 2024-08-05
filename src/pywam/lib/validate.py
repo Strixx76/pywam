@@ -36,16 +36,16 @@ def speakers(speakers: list[Speaker]) -> list[Speaker]:
             If Speaker has no IP or MAC attribute.
     """
     if not isinstance(speakers, list):
-        raise TypeError('Speaker must be a list of Speaker object.')
+        raise TypeError('Speaker must be a list of Speaker object')
 
     from pywam.speaker import Speaker  # To avoid circular imports
     for speaker in speakers:
         if not isinstance(speaker, Speaker):
-            raise TypeError('Speaker must be a Speaker object.')
+            raise TypeError('Speaker must be a Speaker object')
         if not speaker.ip:
-            raise ValueError('Speaker has no IP address.')
+            raise ValueError('Speaker has no IP address')
         if not speaker.attribute.mac:
-            raise ValueError('Speaker has no MAC address.')
+            raise ValueError('Speaker has no MAC address')
 
     return speakers
 
@@ -71,15 +71,15 @@ def equalizer_preset(preset: EqualizerPreset,
             If preset is not found on the speaker.
     """
     if not preset_list:
-        raise ValueError('Can not find any presets on the speaker.')
+        raise ValueError('Can not find any presets on the speaker')
     if not isinstance(preset, EqualizerPreset):
-        raise TypeError('Preset must be a EqualizerPreset object.')
+        raise TypeError('Preset must be a EqualizerPreset object')
     for in_list in preset_list:
         if preset.name == in_list.name:
             if preset.index == in_list.index:
                 return preset
 
-    raise ValueError('Preset could not be found on the speaker.')
+    raise ValueError('Preset could not be found on the speaker')
 
 
 def equalizer_values(values: EqualizerValues) -> EqualizerValues:
@@ -99,13 +99,13 @@ def equalizer_values(values: EqualizerValues) -> EqualizerValues:
             If value is not within range if given.
     """
     if not isinstance(values, EqualizerValues):
-        raise TypeError('Preset must be a EqualizerValues object.')
+        raise TypeError('Preset must be a EqualizerValues object')
 
     for value in values.values:
         if not isinstance(value, int):
-            raise TypeError('Equalizer band value must be a integer.')
+            raise TypeError('Equalizer band value must be a integer')
         if not -6 <= value <= 6:
-            raise ValueError('Equalizer band value must be between -6 and 6.')
+            raise ValueError('Equalizer band value must be between -6 and 6')
 
     return values
 
@@ -125,7 +125,7 @@ def is_boolean(val: bool) -> bool:
             If value is not a boolean.
     """
     if not isinstance(val, bool):
-        raise TypeError('Value must be a boolean.')
+        raise TypeError('Value must be a boolean')
     return val
 
 
@@ -149,11 +149,11 @@ def is_integer(val: int, in_range: tuple[int, int] | None = None) -> int:
             If value is not within range if given.
     """
     if not isinstance(val, int):
-        raise TypeError('Value must be a integer.')
+        raise TypeError('Value must be a integer')
     if in_range:
         if not in_range[0] <= val <= in_range[1]:
             raise ValueError(
-                f'Value must be between {in_range[0]} and {in_range[1]}.'
+                f'Value must be between {in_range[0]} and {in_range[1]}'
             )
     return val
 
@@ -175,13 +175,13 @@ def ip(ip: str) -> str:
             If IP address is not private.
     """
     if not isinstance(ip, str):
-        raise TypeError('Speaker IP must be a string.')
+        raise TypeError('Speaker IP must be a string')
     try:
         test_ip = ipaddress.ip_address(ip)
     except Exception:
-        raise TypeError('Speaker IP is not a valid IP address.')
+        raise TypeError('Speaker IP is not a valid IP address')
     if not test_ip.is_private:
-        raise ValueError('Speaker IP is not a private IP address.')
+        raise ValueError('Speaker IP is not a private IP address')
     return ip
 
 
@@ -202,13 +202,13 @@ def name(name: str) -> str:
             If name is not valid.
     """
     if not isinstance(name, str):
-        raise TypeError('Speaker name must be a string.')
+        raise TypeError('Speaker name must be a string')
     if not name.isprintable():
-        raise ValueError('Speaker name contains unprintable characters.')
+        raise ValueError('Speaker name contains unprintable characters')
     if len(name) > 64:
-        raise ValueError('Speaker name to long.')
+        raise ValueError('Speaker name to long')
     if len(name) < 1:
-        raise ValueError('Speaker name to short.')
+        raise ValueError('Speaker name to short')
     return name
 
 
@@ -228,9 +228,9 @@ def port(port: int) -> int:
             IF TCP port is out of range.
     """
     if not isinstance(port, int):
-        raise TypeError('Speaker port must be a integer.')
+        raise TypeError('Speaker port must be a integer')
     if not 0 < port < 65536:
-        raise ValueError('Speaker port is not valid port number.')
+        raise ValueError('Speaker port is not valid port number')
     return port
 
 
@@ -253,15 +253,15 @@ def media_preset(preset: MediaPreset, preset_list: list[MediaPreset]) -> MediaPr
             If preset is not found on the speaker.
     """
     if not preset_list:
-        raise ValueError('Can not find any presets on the speaker.')
+        raise ValueError('Can not find any presets on the speaker')
     if not isinstance(preset, MediaPreset):
-        raise TypeError('Preset must be a MediaPreset object.')
+        raise TypeError('Preset must be a MediaPreset object')
     for in_list in preset_list:
         if preset.title == in_list.title:
             if preset.contentid == in_list.contentid:
                 return preset
 
-    raise ValueError('Preset could not be found on the speaker.')
+    raise ValueError('Preset could not be found on the speaker')
 
 
 def source(source: str, model: str | None) -> str:
@@ -285,12 +285,12 @@ def source(source: str, model: str | None) -> str:
     if not isinstance(source, str):
         raise TypeError('Source must be a string')
     if not isinstance(model, str):
-        raise ValueError('Could not find speaker model.')
+        raise ValueError('Could not find speaker model')
     if model not in SPEAKER_MODELS:
         model = 'UNRECOGNIZED'
     sources = SPEAKER_MODELS[model]['sources']
     if source not in sources:
-        raise ValueError('Could not find selected source.')
+        raise ValueError('Could not find selected source')
     return source
 
 
@@ -332,13 +332,13 @@ def user(user: str) -> str:
             If UUID is not a valid UUID
     """
     if not isinstance(user, str):
-        raise TypeError('User must be a string.')
+        raise TypeError('User must be a string')
     if not user:
         return str(uuid.uuid1())
     try:
         val_user = uuid.UUID(user)
     except Exception:
-        raise ValueError('Given UUID is not valid.')
+        raise ValueError('Given UUID is not valid')
     return str(val_user)
 
 
@@ -359,7 +359,7 @@ def volume(volume: int) -> int:
             If volume is out of range.
     """
     if not isinstance(volume, int):
-        raise TypeError("Volume must be an integer.")
+        raise TypeError("Volume must be an integer")
     if not 0 <= volume <= 100:
-        raise ValueError("Volume must be between 0 and 100.")
+        raise ValueError("Volume must be between 0 and 100")
     return volume

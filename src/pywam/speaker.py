@@ -299,7 +299,7 @@ class Speaker():
             RepeatMode
         """
         if repeat_mode not in ['all', 'one', 'off']:
-            raise ValueError('Repeat mode not valid.')
+            raise ValueError('Repeat mode not valid')
         return await self.client.request(api_call.set_uic_repeat_mode(repeat_mode))
 
     @is_it_supported

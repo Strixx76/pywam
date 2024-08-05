@@ -38,7 +38,7 @@ def init(speaker_model: str | None) -> None:
     """
     # It should not be possible to change model
     if _init:
-        raise PywamError('Can only be initialized once.')
+        raise PywamError('Can only be initialized once')
     # Get info
     if not speaker_model:
         speaker_model = ''
@@ -87,7 +87,7 @@ def encode_source(source: str) -> str:
     try:
         return _source_to_api[source]
     except KeyError:
-        raise ValueError('Could not find source.')
+        raise ValueError('Could not find source')
 
 
 def decode_source(source: str) -> str:

@@ -106,12 +106,11 @@ class WamClient:
         """
         # Make sure only one .connect() is running.
         if self._connecting:
-            raise ConnectionError('Already trying to connect to speaker.')
+            raise ConnectionError('Already trying to connect to speaker')
         if self.is_connected:
-            raise ConnectionError('Already connected to speaker.')
+            raise ConnectionError('Already connected to speaker')
         if self._disconnecting:
-            raise ConnectionError('Waiting for speaker to disconnect.')
-
+            raise ConnectionError('Waiting for speaker to disconnect')
         self._connecting = True
 
         if self._event_reader or self._event_writer:
@@ -124,7 +123,7 @@ class WamClient:
             )
         except asyncio.TimeoutError as exc:
             await self.disconnect()
-            raise ConnectionError('Timeout when trying to connect to speaker.') from exc
+            raise ConnectionError('Timeout when trying to connect to speaker') from exc
         except Exception as exc:
             await self.disconnect()
             raise ConnectionError('Could not connect to speaker') from exc
@@ -134,9 +133,9 @@ class WamClient:
     async def start_listening(self) -> None:
         """ Start listen to events from the speaker. """
         if not self.is_connected:
-            raise ConnectionError('Not connected to the speaker.')
+            raise ConnectionError('Not connected to the speaker')
         if self._listener_task:
-            await self.stop_listening()
+            raise ConnectionError('Listener is already running')
         self._listener_task = asyncio.create_task(self._receive_loop())
 
     async def disconnect(self):
@@ -189,7 +188,7 @@ class WamClient:
             ApiCallTimeoutError: If correct response was not received.
         """
         if not self.is_connected or not self.is_listening:
-            raise ConnectionError('No connection with speaker.')
+            raise ConnectionError('No connection with speaker')
 
         # Make sure that a second call is not made until we receive a
         # correct answer or get time out on current call.
@@ -209,7 +208,7 @@ class WamClient:
             )
         except Exception as e:
             await self.disconnect()
-            raise ConnectionError('Could not connect to speaker.') from e
+            raise ConnectionError('Could not connect to speaker') from e
 
         # Send to the speaker.
         request = f'GET {api_call.url}{self._http_request}'
@@ -321,7 +320,7 @@ class WamClient:
                 response in.
         """
         if not self._response_queue:
-            raise RuntimeError('asyncio.Queue not initialized.')
+            raise RuntimeError('asyncio.Queue not initialized')
         while True:
             api_response = await self._response_queue.get()
             if api_response.method != api_call.expected_response:
@@ -361,7 +360,7 @@ class WamClient:
             TypeError: If given argument is not a callable.
         """
         if not callable(callback):
-            raise TypeError('Subscriber must be a callable.')
+            raise TypeError('Subscriber must be a callable')
         self._subscribers.add(callback)
 
     def unregister_subscriber(self, callback: Callable) -> None:

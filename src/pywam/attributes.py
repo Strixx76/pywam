@@ -304,10 +304,10 @@ class WamAttributes:
 
     @ property
     def clients(self) -> dict[str, str] | None:
-        """ Return a dictonary of connected clients.
+        """ Return a dictionary of connected clients.
 
         Returns:
-            {"IP adress": "UUID"}
+            {"IP address": "UUID"}
         """
         if not self._iptable:
             return None
@@ -332,7 +332,7 @@ class WamAttributes:
 
     @ property
     def group_name(self) -> str | None:
-        """ Return group's name if grouped. """
+        """ Return group's name. """
         return self._groupname
 
     @ property
@@ -488,7 +488,7 @@ class WamAttributes:
 
     @ property
     def tunein_presets(self) -> list[MediaPreset]:
-        """ Return TuenIn presets stored in speaker. """
+        """ Return TuneIn presets stored in speaker. """
         if not self._media_presetlist:
             return []
         app = 'TuneIn'
