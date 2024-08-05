@@ -138,6 +138,7 @@ class Speaker():
         """
         self.client.request_timeout = request_timeout
         self.client.connection_timeout = connection_timeout
+        self.client.register_subscriber(self.events.receiver)
         await self.client.connect()
         await self.client.start_listening()
 
@@ -145,6 +146,14 @@ class Speaker():
         """ Disconnect from speaker. """
         await self.client.stop_listening()
         await self.client.disconnect()
+        self.client.unregister_subscriber(self.events.receiver)
+
+    @property
+    def is_connected(self) -> bool:
+        """ Return True if connected to speaker, otherwise False. """
+        if self.client.is_connected and self.client.is_listening:
+            return True
+        return False
 
     # ******************************************************************
     # Commands

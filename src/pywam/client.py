@@ -19,10 +19,11 @@ import asyncio
 import logging
 from typing import TYPE_CHECKING, Any, Callable, Set
 
-from pywam.lib.api_response import api_decode, api_error
+from pywam.lib.api_response import ApiResponse, api_decode, api_error
 from pywam.lib.exceptions import ApiCallTimeoutError
 from pywam.lib.http import build_http_header, parse_stream
 from pywam.lib.validate import is_integer
+
 
 if TYPE_CHECKING:
     from pywam.lib.api_call import ApiCall
@@ -56,14 +57,14 @@ class WamClient:
         self._connecting: bool = False
         self._disconnecting: bool = False
         # Events listener
-        self._listening: bool = False
+        self._listening: asyncio.Event = asyncio.Event()
         self._listener_task: asyncio.Task | None = None
         # Event and response handling
         self._subscribers: Set[Callable] = set()
         self._response_queue: asyncio.Queue[ApiResponse] | None = None
         # API requests
-        self._http_request: str = build_http_header(ip, port, user)
-        self._request_timeout: int = 5
+        self._http_request: str = build_http_header(self._ip, self._port, self._user)
+        self._request_timeout: int = 10
 
     @property
     def is_connected(self) -> bool:
@@ -75,9 +76,7 @@ class WamClient:
     @property
     def is_listening(self) -> bool:
         """ Returns true when listening for responses from speaker. """
-        if self._listening:
-            return True
-        return False
+        return self._listening.is_set()
 
     @property
     def connection_timeout(self) -> int:
@@ -105,7 +104,6 @@ class WamClient:
         Raises:
             ConnectionError: If connection is not established.
         """
-        # Make sure only one .connect() is running.
         if self._connecting:
             raise ConnectionError('Already trying to connect to speaker')
         if self.is_connected:
@@ -113,9 +111,6 @@ class WamClient:
         if self._disconnecting:
             raise ConnectionError('Waiting for speaker to disconnect')
         self._connecting = True
-
-        if self._event_reader or self._event_writer:
-            await self.disconnect()
 
         try:
             self._event_reader, self._event_writer = await asyncio.wait_for(
@@ -137,27 +132,24 @@ class WamClient:
             raise ConnectionError('Not connected to the speaker')
         if self._listener_task:
             raise ConnectionError('Listener is already running')
+
         self._listener_task = asyncio.create_task(self._receive_loop())
+        await self._listening.wait()
 
     async def disconnect(self):
         """ Disconnect from speaker. """
-
         if self._disconnecting:
             return
         self._disconnecting = True
-
-        # NB! Always try to stop listening to be sure!
-        try:
-            await self.stop_listening()
-        except Exception:  # pylint: disable=broad-except
-            pass
 
         if self._event_writer:
             try:
                 self._event_writer.close()
                 await self._event_writer.wait_closed()
             except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception('Unhandled exception when disconnecting.')
+
+        self._event_reader = None
+        self._event_writer = None
 
         self._disconnecting = False
 
@@ -173,6 +165,7 @@ class WamClient:
                 _LOGGER.exception('Unhandled exception when canceling listener task.')
             finally:
                 self._listener_task = None
+        self._listening.clear()
 
     async def request(self, api_call: ApiCall) -> ApiResponse:
         """ Send API to the speaker.
@@ -195,7 +188,6 @@ class WamClient:
         # correct answer or get time out on current call.
         while self._response_queue:
             await asyncio.sleep(1)
-        self._response_queue = asyncio.Queue(1)
 
         # Start a writer
         # We need to use new StreamWriter at every call to not get EOF
@@ -216,11 +208,18 @@ class WamClient:
         writer.write(request.encode())
         await writer.drain()
 
+        # For some API the speaker has no response.
+        if not api_call.expected_response:
+            return ApiResponse()
+
         # Wait for correct response.
+        self._response_queue = asyncio.Queue(1)
         try:
             response = await asyncio.wait_for(
                 self._wait_for_response(api_call),
                 timeout=self._request_timeout * api_call.timeout_multiple)
+        except asyncio.TimeoutError:
+            raise ApiCallTimeoutError('No response from speaker')
         except Exception as e:
             raise ApiCallTimeoutError('Error while waiting for response') from e
         finally:
@@ -231,6 +230,11 @@ class WamClient:
 
         return response
 
+    async def _receive_loop_error(self) -> None:
+        """ Cancel the receive loop task and disconnect. """
+        await self.stop_listening()
+        await self.disconnect()
+
     async def _receive_loop(self) -> None:
         """ Listen for api responses from the speaker.
 
@@ -238,22 +242,19 @@ class WamClient:
         responses (events and api requests) from the speaker.
         """
         buffer: bytes = b''
-        self._listening = True
-        while True:
-            try:
+        self._listening.set()
+        try:
+            while True:
                 # If there is a problem with the StreamReader we need
                 # to disconnect, so that the user can check this.
                 if not self._event_reader:
-                    self._listening = False
-                    await self.disconnect()
                     break
-
                 data = await self._event_reader.read(1024)
                 # If we receive an empty byte something is wrong!
                 if not data:
-                    _LOGGER.warning('Disconnecting because listener received EOF')
-                    await self.disconnect()
-                _LOGGER.debug('Listener received data:')
+                    _LOGGER.warning('(%s) Disconnecting because listener received EOF', self._ip)
+                    break
+                _LOGGER.debug('(%s) Listener received data:', self._ip)
                 _LOGGER.debug(data)
                 data = buffer + data
                 http_responses = parse_stream(data)
@@ -262,14 +263,13 @@ class WamClient:
                         await self._response_handler(http_response)
                     buffer = http_response.remainder
 
-            except asyncio.CancelledError:
-                _LOGGER.debug('Receive loop is cancelled.')
-                self._listening = False
-                raise
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception('Disconnecting due to error while reading stream')
-                self._listening = False
-                await self.disconnect()
+        except asyncio.CancelledError:
+            _LOGGER.debug('(%s) Receive loop is cancelled', self._ip)
+            raise
+        except Exception:  # pylint: disable=broad-except
+            _LOGGER.exception('(%s) Disconnecting due to error while reading stream', self._ip)
+
+        await self._receive_loop_error()
 
     async def _response_handler(self, http_response: 'HttpResponse') -> None:
         """ Handles incoming HTTP responses.
@@ -303,7 +303,6 @@ class WamClient:
                 ApiResponse object to be returned to caller.
         """
         if self._response_queue:
-            _LOGGER.debug('Queueing api response.')
             await self._response_queue.put(api_response)
 
     async def _wait_for_response(self, api_call: 'ApiCall') -> 'ApiResponse':

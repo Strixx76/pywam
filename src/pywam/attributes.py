@@ -134,8 +134,6 @@ class WamAttributes:
                     URL to station logo thumbnail.
                 title(str):
                     Title of radio station.
-        _online:
-            Is there a live connection to the speaker.
         _last_seen:
             Timestamp when speaker was last heard from.
     """
@@ -197,7 +195,6 @@ class WamAttributes:
         # Media presets (media/app/channel favorites)
         self._media_presetlist: dict[str, list[dict[str, str]]] = {}
         # PYWAM ATTRIBUTES
-        self._online: bool = False
         self._last_seen: datetime | None = None
 
     def __str__(self):
@@ -258,7 +255,6 @@ class WamAttributes:
 
             '_media_presetlist': copy.deepcopy(self._media_presetlist),
 
-            '_online': self._online,
             '_last_seen': self._last_seen,
         }
 
@@ -525,11 +521,6 @@ class WamAttributes:
             return []
         app = 'TuneIn'
         return [MediaPreset(cpname=app, **preset) for preset in self._media_presetlist[app]]
-
-    @ property
-    def online(self) -> bool:
-        """ Return True if connected to speaker. """
-        return self._online
 
     @ property
     def last_seen(self) -> datetime | None:
