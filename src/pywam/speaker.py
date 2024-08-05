@@ -16,7 +16,8 @@ from pywam.attributes import WamAttributes
 from pywam.lib import api_call, translate, validate
 from pywam.lib.const import APP_FEATURES, Feature, SOURCE_FEATURES
 from pywam.lib.equalizer import EqualizerPreset
-from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError, PywamError
+from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError
+
 
 if TYPE_CHECKING:
     from pywam.lib.api_response import ApiResponse

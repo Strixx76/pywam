@@ -27,7 +27,6 @@ from pywam.lib.validate import is_integer
 
 if TYPE_CHECKING:
     from pywam.lib.api_call import ApiCall
-    from pywam.lib.api_response import ApiResponse
     from pywam.lib.http import HttpResponse
     from pywam.speaker import Speaker
 

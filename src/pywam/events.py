@@ -60,7 +60,6 @@ class WamEvents:
             return
         used = event_method(event)
 
-        self._attr._online = True
         self._attr._last_seen = datetime.now()
 
         # Send the event

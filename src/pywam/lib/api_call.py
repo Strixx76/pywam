@@ -714,7 +714,6 @@ def set_multispk_group_subspk(name: str,
                          ('mainspkip', mainspkip, 'str'),
                          ('mainspkmacaddr', mainspkmacaddr, 'str'),
                          ],
-                   expected_response='MultispkGroup',
                    user_check=False,
                    timeout_multiple=3,
                    )
@@ -731,10 +730,10 @@ def set_ungroup() -> ApiCall:
                    timeout_multiple=1,
                    )
 
+
 # **********************************************************************
 # Equalizer
 # **********************************************************************
-
 
 def get_current_eq_mode() -> ApiCall:
     """ (UIC) Retrieve current equalizer settings. """
@@ -824,6 +823,10 @@ def set_7band_eq_value(presetindex: int,
                    timeout_multiple=1,
                    )
 
+
+# **********************************************************************
+# Browsing
+# **********************************************************************
 
 def set_locale(locale: str) -> ApiCall:
     """ (CPM) Change speaker locale.
