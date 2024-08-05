@@ -754,8 +754,7 @@ def get_7band_eq_list() -> ApiCall:
                    pwron=False,
                    method='Get7BandEQList',
                    args=[],
-                   # TODO: Expected response
-                   expected_response='',
+                   expected_response='7BandEQList',
                    user_check=False,
                    timeout_multiple=1,
                    )

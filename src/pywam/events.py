@@ -497,6 +497,56 @@ class WamEvents:
         """
         return False
 
+    def event_AvSourceAddedEvent(self, event: 'ApiResponse') -> bool:
+        """ Found new AV-source on the network.
+
+        method (str): 'AvSourceAddedEvent'
+        type: (str): 'UIC'
+        version (str): '1.0'
+        speakerip (str): Speakers IP-address.
+        user_identifier (str): 'public'
+
+        response (dict):
+            @result(str): 'ok' | 'ng'
+            avdeviceip(str):
+                IP address of the new AV-source
+            avdevicemacaddr(str):
+                MAC address of the new AV-source
+            avdevicename(str):
+                Name of the new AV-source
+            avdevicetype(str):
+                Type of AV-source ('tv')
+            avdevicemultichinfo(str):
+                'on'
+            dfsstatus(str):
+                'dfsoff'
+        """
+        return False
+
+    def event_AvSourceDeletedEvent(self, event: 'ApiResponse') -> bool:
+        """ AV-source disappeared from on the network.
+
+        method (str): 'AvSourceDeletedEvent'
+        type: (str): 'UIC'
+        version (str): '1.0'
+        speakerip (str): Speakers IP-address.
+        user_identifier (str): 'public'
+
+        response (dict):
+            @result(str): 'ok' | 'ng'
+            avdeviceip(str):
+                IP address of the new AV-source
+            avdevicemacaddr(str):
+                MAC address of the new AV-source
+            avdevicename(str):
+                Name of the new AV-source
+            avdevicetype(str):
+                Type of AV-source ('tv')
+            avdevicemultichinfo(str):
+                'on'
+        """
+        return False
+
     def event_BatteryStatus(self, event: 'ApiResponse') -> bool:
         """ ????.
 
