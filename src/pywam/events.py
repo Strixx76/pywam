@@ -139,7 +139,7 @@ class WamEvents:
 
     # TODO: Events not discovered yet, but present in other projects:
     # PowerStatus, RearLevel, ToggleShuffle, AmazonCpSelected, SkipInfo
-    # EndPlaybackEvent, SubMenu, ErrorEvent, RadioPlayList
+    # SubMenu, ErrorEvent, RadioPlayList
 
     def event_7BandEQList(self, event: 'ApiResponse') -> bool:
         """ List of all equalizer presets on the speaker.
@@ -844,9 +844,9 @@ class WamEvents:
         return True
 
     def event_DmsList(self, event: 'ApiResponse') -> bool:
-        """ UIC - DNLA servers found by the speaker.
+        """ UIC - DLNA servers found by the speaker.
 
-        List all dnla music servers found by the speaker.
+        List all dlna music servers found by the speaker.
 
         method (str): 'DmsList'
         type: (str): 'UIC'
@@ -871,6 +871,26 @@ class WamEvents:
             listtotalcount(str):
         """
         return False
+
+    def event_EndPlaybackEvent(self, event: 'ApiResponse') -> bool:
+        """ Start playback.
+
+        Sent when stopping playback on the speaker.
+
+        method (str): 'EndPlaybackEvent'
+        type: (str): 'UIC'
+        version (str): '1.0'
+        speakerip (str): Speakers IP-address.
+        user_identifier (str): 'public'
+
+        response (dict):
+            @result(str):
+                'ok' | 'ng'
+            playtime(str):
+                ?
+        """
+        self._attr._playstatus = 'stop'
+        return True
 
     def event_EQDrc(self, event: 'ApiResponse') -> bool:
         """ ????.
@@ -1978,7 +1998,7 @@ class WamEvents:
     def event_StartPlaybackEvent(self, event: 'ApiResponse') -> bool:
         """ Start playback.
 
-        Sometimes sent when starting playback on the speaker.
+        Sent when starting playback on the speaker.
 
         method (str): 'StartPlaybackEvent'
         type: (str): 'UIC'
