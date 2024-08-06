@@ -1281,6 +1281,8 @@ class WamEvents:
     def event_MusicInfo(self, event: 'ApiResponse') -> bool:
         """ Information about what is playing.
 
+        This is for UIC, eg DLNA.
+
         method (str): 'MusicInfo'
         type: (str): 'UIC'
         version (str): '1.0'
@@ -1324,7 +1326,24 @@ class WamEvents:
             title(str, optional):
                 Song title.
         """
-        return False
+        # TODO: Is playbacktype=playlist an indication that next and previous is supported?
+        # TODO: Is pause=enable an indication that pause is supported?
+
+        self._attr._album = event.get_key('album', self._attr._album)
+        self._attr._artist = event.get_key('artist', self._attr._artist)
+        self._attr._thumbnail = event.get_key('thumbnail', self._attr._thumbnail)
+        self._attr._title = event.get_key('title', self._attr._title)
+
+        # TODO: Doesn't comply with how we do other things. This should be done in the
+        # attributes module.
+        timelength = event.get_key('timelength', "0").replace('.', ':')
+        try:
+            tl = int(sum(x * int(t) for x, t in zip([3600, 60, 1, 0.001], timelength.split(":"))))
+        except Exception:
+            tl = 0
+        self._attr._tracklength = str(tl)
+
+        return True
 
     def event_MusicList(self, event: 'ApiResponse') -> bool:
         """ ????.
