@@ -169,7 +169,7 @@ class Speaker():
         """ Send pause command to speaker. """
         if self.attribute._submode == 'cp':
             await self.client.request(api_call.set_cpm_playback_control('pause'))
-        elif self.attribute._submode == 'dnla':
+        elif self.attribute._submode == 'dlna':
             await self.client.request(api_call.set_uic_playback_control('pause'))
 
     @is_it_supported
@@ -177,7 +177,7 @@ class Speaker():
         """ Send play command to speaker. """
         if self.attribute._submode == 'cp':
             await self.client.request(api_call.set_cpm_playback_control('play'))
-        elif self.attribute._submode == 'dnla':
+        elif self.attribute._submode == 'dlna':
             await self.client.request(api_call.set_uic_playback_control('resume'))
 
     @is_it_supported
