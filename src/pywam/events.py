@@ -843,6 +843,35 @@ class WamEvents:
         self._attr._device_id = event.get_key('device_id')
         return True
 
+    def event_DMSAddedEvent(self, event: 'ApiResponse') -> bool:
+        """ UIC - New DLNA server discovered.
+
+        method (str): 'DMSAddedEvent'
+        type: (str): 'UIC'
+        version (str): '1.0'
+        speakerip (str): Speakers IP-address.
+        user_identifier (str): 'public'
+
+        response (dict):
+            @result(str): 'ok' | 'ng'
+        """
+        return False
+
+    def event_DMSDeletedEvent(self, event: 'ApiResponse') -> bool:
+        """ UIC - DLNA removed from network.
+
+        method (str): 'DMSDeletedEvent'
+        type: (str): 'UIC'
+        version (str): '1.0'
+        speakerip (str): Speakers IP-address.
+        user_identifier (str): 'public'
+
+        response (dict):
+            @result(str): 'ok' | 'ng'
+            device_udn (str): Source device unique identifier.
+        """
+        return False
+
     def event_DmsList(self, event: 'ApiResponse') -> bool:
         """ UIC - DLNA servers found by the speaker.
 
