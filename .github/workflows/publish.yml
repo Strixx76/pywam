@@ -1,4 +1,4 @@
-name: Upload Python Test Package
+name: Upload Python Package
 
 on: workflow_dispatch
 
@@ -7,11 +7,11 @@ permissions:
 
 jobs:
   deploy:
-    name: Publish release to TestPyPI
+    name: Publish release to PyPI
     runs-on: ubuntu-latest
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/pywam
+      name: pypi
+      url: https://pypi.org/p/pywam
     permissions:
       id-token: write
 
@@ -31,7 +31,5 @@ jobs:
     - name: Build package
       run: python -m build
 
-    - name: Publish package distributions to TestPyPI
+    - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
