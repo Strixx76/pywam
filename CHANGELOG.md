@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.0] - 2024-08-14
+## [unreleased] - ????
+
+## [0.1.0rc1] - 2024-08-14
+
+NB! This release is versioned as a release candidate only because the need of changing the
+requirements in the Samsung WAM integration for Home Assistant. This release is not compatible
+with that integration, but that project has set the requirements to pywam>=0.0.1.
 
 - Fixed typo with grouping attributes
 - Fixed a bug for 0 volume
@@ -20,3 +26,4 @@ All notable changes to this project will be documented in this file.
 
 [unreleased]: https://github.com/Strixx76/pywam
 [0.0.1]: https://github.com/Strixx76/pywam/tree/v0.0.1
+[0.1.0rc1]: https://github.com/Strixx76/pywam/tree/v0.1.0rc1
