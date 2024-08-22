@@ -1385,7 +1385,7 @@ class WamEvents:
 
         # TODO: Doesn't comply with how we do other things. This should be done in the
         # attributes module.
-        timelength = event.get_key('timelength', "0").replace('.', ':')
+        timelength = str(event.get_key('timelength', '0')).replace('.', ':')
         try:
             tl = int(sum(x * int(t) for x, t in zip([3600, 60, 1, 0.001], timelength.split(":"))))
         except Exception:

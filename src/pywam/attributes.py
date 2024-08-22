@@ -470,7 +470,10 @@ class WamAttributes:
     @ property
     def media_image_url(self) -> str | None:
         """ Return url to image fo current playing media. """
-        return self._thumbnail
+        if self._thumbnail:
+            if self._thumbnail.startswith('http'):
+                return self._thumbnail
+        return None
 
     @ property
     def media_duration(self) -> int | None:
