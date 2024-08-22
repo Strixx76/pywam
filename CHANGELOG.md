@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased] - ????
 
+## [0.1.0rc2] - 2024-08-22
+
+- Fixed DLNA bugs
+
 ## [0.1.0rc1] - 2024-08-14
 
 NB! This release is versioned as a release candidate only because the need of changing the
