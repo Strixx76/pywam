@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased] - ????
+## [unreleased] - ???
+
+## [0.1.0rc3] - 2024-09-05
+
+- Fixes for URL playback
+- Small fixes for DLNA attributes
 
 ## [0.1.0rc2] - 2024-08-22
 
