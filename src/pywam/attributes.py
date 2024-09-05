@@ -396,7 +396,7 @@ class WamAttributes:
     def state(self) -> str | None:
         """ Return speaker state.
 
-        Possible values are:  'stop' | 'play' | 'pause'
+        Possible values are:  'stop' | 'play' | 'pause' | 'resume'
         """
         return self._playstatus
 

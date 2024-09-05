@@ -1538,7 +1538,7 @@ class WamEvents:
                 Current selected source.
                 'wifi' (Only when submode = 'cp'?)
             playstatus(str):
-                'play'|'pause'
+                'play'|'pause' | 'stop' | 'resume'
             submode(str, optional):
                 'cp' (Only when app is playing, not TuneIn?)
             timestamp(str, optional):

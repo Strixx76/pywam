@@ -54,7 +54,7 @@ APP_FEATURES: dict[str, list[str]] = {
     'Amazon': [Feature.PAUSE, Feature.STOP, Feature.PLAY],
     'TuneIn': [Feature.PAUSE, Feature.PLAY],
     'Unknown': [Feature.PAUSE, Feature.STOP, Feature.PLAY],
-    'dlna': [Feature.PAUSE, Feature.PLAY, Feature.PREV,
+    'DLNA': [Feature.PAUSE, Feature.PLAY, Feature.PREV,
              Feature.NEXT, Feature.SET_SHUFFLE, Feature.SET_REPEAT],
     'URL Playback': [],
 }
