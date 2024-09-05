@@ -56,6 +56,7 @@ APP_FEATURES: dict[str, list[str]] = {
     'Unknown': [Feature.PAUSE, Feature.STOP, Feature.PLAY],
     'dlna': [Feature.PAUSE, Feature.PLAY, Feature.PREV,
              Feature.NEXT, Feature.SET_SHUFFLE, Feature.SET_REPEAT],
+    'URL Playback': [],
 }
 
 SOURCE_FEATURES: dict[str, list[str]] = {

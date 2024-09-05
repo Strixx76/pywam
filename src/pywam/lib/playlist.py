@@ -56,7 +56,7 @@ def parse_playlist(playlist: str, mime_type: str | None = None) -> list[UrlMedia
             Format of the playlist. If left out we will try to guess it.
 
     Returns:
-        First item in playlist as UrlMediaItem.
+        Playlist as list of UrlMediaItem.
     """
     if mime_type is None:
         list_format = _find_playlist_format(playlist)
@@ -76,10 +76,7 @@ def parse_playlist(playlist: str, mime_type: str | None = None) -> list[UrlMedia
 
 
 def _find_playlist_format(playlist: str) -> str:
-    """ Figure out format of the playlist.
-
-    Parse the playlist into a list of MediaItems. If no format is
-    provided then try to figure it depending on content.
+    """ Try to find out format of the playlist.
 
     Arguments:
         playlist:

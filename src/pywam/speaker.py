@@ -171,6 +171,12 @@ class Speaker():
             await self.client.request(api_call.set_cpm_playback_control('pause'))
         elif self.attribute._submode == 'dlna':
             await self.client.request(api_call.set_uic_playback_control('pause'))
+        # TODO: 'pause' is supported for url_playback via `set_uic_playback_control`
+        # but I have not found any way to resume it. 'resume', 'play' and 'stop'
+        # is not supported for url_playback! It has happened that it has resumed
+        # resumed by it self hours after it was paused. So until we find out
+        # how to resume it and how to stop it we don't support 'pause' either.
+        # User will have to mute the stream.
 
     @is_it_supported
     async def cmd_play(self) -> None:

@@ -2182,10 +2182,10 @@ class WamEvents:
         """ Url playing.
 
         method (str): 'UrlPlayback'
-        type: (str): ?
-        version (str): ?
+        type: (str): 'UIC'
+        version (str): '1.0'
         speakerip (str): Speakers IP-address.
-        user_identifier (str): ?
+        user_identifier (str): 'None'
 
         response (dict):
             @result (str):

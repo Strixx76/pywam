@@ -517,7 +517,7 @@ def set_url_playback(url: str, buffersize: int, seektime: int, resume: int) -> A
                          ('resume', int(resume), 'dec'), ],
                    expected_response='UrlPlayback',
                    user_check=False,
-                   timeout_multiple=2,
+                   timeout_multiple=5,
                    )
 
 

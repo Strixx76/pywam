@@ -434,9 +434,9 @@ class WamAttributes:
         if self._submode == 'cp':
             return self._cpname
         elif self._submode == 'dlna':
-            return 'dlna'
+            return 'DLNA'
         elif self._submode == 'url':
-            return 'url'
+            return 'URL Playback'
 
         return None
 

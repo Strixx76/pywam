@@ -12,9 +12,6 @@ from urllib.parse import urlsplit
 
 # https://www.iana.org/assignments/media-types/media-types.xhtml
 SUPPORTED_MIME_TYPES = (
-    'application/ogg',
-    'audio/3gpp',
-    'audio/3gpp2',
     'audio/aac',
     'audio/aacp',
     'audio/aiff',
@@ -96,7 +93,16 @@ class UrlMediaItem:
         if self._description:
             return self._description
 
-        return self._url
+        description = 'URL stream'
+        try:
+            path = urlsplit(self._url).path
+            file = path.split('/')[-1]
+            if file:
+                description = file
+        except Exception:
+            pass
+
+        return description
 
     @property
     def duration(self) -> str | None:
