@@ -758,6 +758,12 @@ class WamEvents:
                 (If 'function' != 'wifi', always 'None')
                 Other projects also have: 'dmr', 'device'
         """
+        # Workaround for UrlPlayback
+        # If the native app is started we need to ignore the attributes
+        # if we are playing a url.
+        if event.get_key('submode') == 'cp' and self._attr._submode == 'url':
+            return False
+
         function = event.get_key('function')
         if function != self._attr._function:
             self._attr.reset_media_info()
@@ -1507,6 +1513,12 @@ class WamEvents:
             submode(str):
                 'cp'|'dlna'
         """
+        # Workaround for UrlPlayback
+        # If the native app is started we need to ignore the attributes
+        # if we are playing a url.
+        if event.get_key('cpname') == 'Unknown' and self._attr._submode == 'url':
+            return False
+
         self._attr._playstatus = event.get_key('playstatus', self._attr._playstatus)
         self._attr._function = event.get_key('function', self._attr._function)
         self._attr._submode = event.get_key('submode', self._attr._submode)
@@ -1544,6 +1556,12 @@ class WamEvents:
             timestamp(str, optional):
                 UTC ISO 8601 format (eg '2020-02-19T17:26:24Z')
         """
+        # Workaround for UrlPlayback
+        # If the native app is started we need to ignore the attributes
+        # if we are playing a url.
+        if event.get_key('cpname') == 'Unknown' and self._attr._submode == 'url':
+            return False
+
         self._attr._playstatus = event.get_key('playstatus', self._attr._playstatus)
         self._attr._function = event.get_key('function', self._attr._function)
         self._attr._submode = event.get_key('submode', self._attr._submode)
@@ -1686,6 +1704,12 @@ class WamEvents:
             tracklength(str, optional):
                 Length of track in seconds.
         """
+        # Workaround for UrlPlayback
+        # If the native app is started we need to ignore the attributes
+        # if we are playing a url.
+        if event.get_key('cpname') == 'Unknown' and self._attr._submode == 'url':
+            return False
+
         cpname = event.get_key('cpname')
         if cpname != self._attr._cpname:
             self._attr.reset_media_info()
@@ -2200,6 +2224,7 @@ class WamEvents:
         self._attr._function = 'wifi'
         self._attr._submode = 'url'
         self._attr._playstatus = 'play'
+        self._attr._cpname = 'Unknown'
         return True
 
     def event_ValidAppVersion(self, event: 'ApiResponse') -> bool:
