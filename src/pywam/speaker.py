@@ -99,12 +99,15 @@ class Speaker():
 
         supported_features: list[str] = []
 
-        # If we don't know all the needed attributes, nothing is supported.
-        if self.attribute._grouptype is None or self.attribute._function is None:
-            return []
-
         # If speaker is slave in group only basic features are supported.
         if self.attribute.is_slave:
+            return supported_features
+
+        # Pause is supported by all services.
+        supported_features.extend([Feature.PAUSE])
+
+        # If we don't know all the needed attributes, we should return now.
+        if self.attribute._grouptype is None or self.attribute._function is None:
             return supported_features
 
         # App and source dependant features
@@ -171,12 +174,21 @@ class Speaker():
             await self.client.request(api_call.set_cpm_playback_control('pause'))
         elif self.attribute._submode == 'dlna':
             await self.client.request(api_call.set_uic_playback_control('pause'))
-        # TODO: 'pause' is supported for url_playback via `set_uic_playback_control`
-        # but I have not found any way to resume it. 'resume', 'play' and 'stop'
-        # is not supported for url_playback! It has happened that it has resumed
-        # resumed by it self hours after it was paused. So until we find out
-        # how to resume it and how to stop it we don't support 'pause' either.
-        # User will have to mute the stream.
+        elif self.attribute._submode == 'url' or self.attribute._submode == 'Unknown':
+            # For url_playback 'pause' is supported but not 'stop'.
+            # But I have not found any way to resume it.
+            # 'resume', 'play' and 'stop' is not supported for url_playback!
+            # It has happened that it has resumed by it self hours after
+            # it was paused. So until we find out how to resume it we
+            # pause the stream and mute the speaker, and then set state
+            # to stop.
+            pause = await self.client.request(api_call.set_uic_playback_control('pause'))
+            if pause.success:
+                mute = await self.client.request(api_call.set_mute(True))
+                if mute.success:
+                    self.attribute._playstatus = 'stop'
+                    self.attribute._cpname = 'Unknown'
+                    self.attribute._submode = 'cp'
 
     @is_it_supported
     async def cmd_play(self) -> None:
