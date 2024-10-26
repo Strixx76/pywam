@@ -2,7 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased] - ???
+## [0.1.0rc4] - 2024-10-26
+
+- More fixes for URL Playback
 
 ## [0.1.0rc3] - 2024-09-05
 
@@ -36,3 +38,6 @@ with that integration, but that project has set the requirements to pywam>=0.0.1
 [unreleased]: https://github.com/Strixx76/pywam
 [0.0.1]: https://github.com/Strixx76/pywam/tree/v0.0.1
 [0.1.0rc1]: https://github.com/Strixx76/pywam/tree/v0.1.0rc1
+[0.1.0rc2]: https://github.com/Strixx76/pywam/tree/v0.1.0rc2
+[0.1.0rc3]: https://github.com/Strixx76/pywam/tree/v0.1.0rc3
+[0.1.0rc4]: https://github.com/Strixx76/pywam/tree/v0.1.0rc4
