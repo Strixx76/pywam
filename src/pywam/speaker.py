@@ -238,7 +238,9 @@ class Speaker():
             preset_type = 0
         preset_index = int(preset.contentid)
 
-        await self.client.request(api_call.set_play_preset(preset_type, preset_index))
+        result = await self.client.request(api_call.set_play_preset(preset_type, preset_index))
+        if result.success and self.attribute.muted:
+            await self.set_mute(False)
 
     @is_it_supported
     async def play_url(self, item: UrlMediaItem) -> None:
@@ -266,7 +268,7 @@ class Speaker():
         item = validate.url_media_item(item)
 
         # Play url with 2Mb buffer size = 2097152
-        result = await self.client.request(api_call.set_url_playback(item.url, 2097152, 0, 0))
+        result = await self.client.request(api_call.set_url_playback(item.url, 0, 0, 0))
 
         # *****************************************************
         # Workaround to set attributes not sent by the speaker.
@@ -281,6 +283,9 @@ class Speaker():
         # set new attributes, otherwise the user will not be notified of
         # the change.
         self.events._dispatch_event(True, result)
+
+        if result.success and self.attribute.muted:
+            await self.set_mute(False)
 
     # ******************************************************************
     # Set
