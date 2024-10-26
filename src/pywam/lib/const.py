@@ -27,6 +27,21 @@ class Feature():
     SELECT_SOURCE = 'select_source'
 
 
+EXC_MESSAGE: dict[str, str] = {
+    'cmd_next': 'Next',
+    'cmd_pause': 'Pause',
+    'cmd_play': 'Play',
+    'cmd_previous': 'Previous',
+    'cmd_stop': 'Stop',
+    'play_preset': 'Playing presets',
+    'play_browser_item': 'Playing browser items',
+    'play_url': 'Playing a URL',
+    'set_name': 'Changing speaker name',
+    'set_repeat_mode': 'Repeat mode',
+    'set_shuffle': 'Shuffle mode',
+    'select_source': 'Selecting source',
+}
+
 APP_FEATURES: dict[str, list[str]] = {
     'Pandora': [Feature.STOP, Feature.PLAY],
     'Spotify': [Feature.PLAY],

@@ -14,7 +14,7 @@ from pywam.client import WamClient
 from pywam.events import WamEvents
 from pywam.attributes import WamAttributes
 from pywam.lib import api_call, translate, validate
-from pywam.lib.const import APP_FEATURES, Feature, SOURCE_FEATURES
+from pywam.lib.const import APP_FEATURES, EXC_MESSAGE, Feature, SOURCE_FEATURES
 from pywam.lib.equalizer import EqualizerPreset
 from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError
 
@@ -41,7 +41,7 @@ def is_it_supported(func):
     @functools.wraps(func)
     def wrapper_is_it_supported(self, *args, **kwargs):
         if func.__name__ not in self.supported_features:
-            raise FeatureNotSupportedError
+            raise FeatureNotSupportedError(f'{EXC_MESSAGE[func.__name__]} is not supported in this mode.')
         return func(self, *args, **kwargs)
     return wrapper_is_it_supported
 
