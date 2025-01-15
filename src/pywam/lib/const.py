@@ -89,13 +89,14 @@ SOURCE_FEATURES: dict[str, list[str]] = {
 SOURCES_BY_NAME: dict[str, str] = {
     'AUX': 'aux',
     'Bluetooth': 'bt',
+    'Coaxial': 'coaxial',
     'HDMI': 'hdmi',
     'HDMI 1': 'hdmi1',
     'HDMI 2': 'hdmi2',
     'Optical': 'optical',
     'TV SoundConnect': 'soundshare',
-    'Wi-Fi': 'wifi',
     'USB': 'usb',
+    'Wi-Fi': 'wifi',
 }
 
 SPEAKER_MODELS: dict[str, dict[str, Any]] = {
@@ -192,7 +193,8 @@ SPEAKER_MODELS: dict[str, dict[str, Any]] = {
                     },
     # Testing
     'WAM270': {'name': 'Multiroom Link Mate',
-               'sources': ['Bluetooth', 'Wi-Fi', 'AUX', 'Optical', 'TV SoundConnect'],
+               'sources': ['Bluetooth', 'Wi-Fi', 'AUX', 'Optical',
+                           'Coaxial', 'TV SoundConnect'],
                'max_api_volume': 30,
                'port': 55001,
                },
