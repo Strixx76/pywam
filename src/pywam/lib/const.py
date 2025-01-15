@@ -77,13 +77,14 @@ APP_FEATURES: dict[str, list[str]] = {
 SOURCE_FEATURES: dict[str, list[str]] = {
     'AUX': [],
     'Bluetooth': [],
+    'Coaxial': [],
     'HDMI': [],
     'HDMI 1': [],
     'HDMI 2': [],
     'Optical': [],
     'TV SoundConnect': [],
-    'Wi-Fi': [Feature.PLAY_URL, Feature.PLAY_PRESET],
     'USB': [],
+    'Wi-Fi': [Feature.PLAY_URL, Feature.PLAY_PRESET],
 }
 
 SOURCES_BY_NAME: dict[str, str] = {
