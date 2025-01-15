@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+
+- Bug fix for new Coaxial source input
+
+## [0.1.0rc5] - 2025-01-15
+
+- New improved grouping method for better stability
+- Add support for LinkMate (WAM-270)
+
 ## [0.1.0rc4] - 2024-10-26
 
 - More fixes for URL Playback
@@ -41,3 +50,4 @@ with that integration, but that project has set the requirements to pywam>=0.0.1
 [0.1.0rc2]: https://github.com/Strixx76/pywam/tree/v0.1.0rc2
 [0.1.0rc3]: https://github.com/Strixx76/pywam/tree/v0.1.0rc3
 [0.1.0rc4]: https://github.com/Strixx76/pywam/tree/v0.1.0rc4
+[0.1.0rc5]: https://github.com/Strixx76/pywam/tree/v0.1.0rc5
