@@ -99,6 +99,7 @@ SOURCES_BY_NAME: dict[str, str] = {
 }
 
 SPEAKER_MODELS: dict[str, dict[str, Any]] = {
+    # Confirmed working
     'SPK-WAM350': {'name': 'Shape M3',
                    'sources': ['Bluetooth', 'Wi-Fi', 'TV SoundConnect'],
                    'max_api_volume': 30,
@@ -189,13 +190,13 @@ SPEAKER_MODELS: dict[str, dict[str, Any]] = {
                     'max_api_volume': 30,
                     'port': 55001,
                     },
-    # Following speakers are not tested.
+    # Testing
     'WAM270': {'name': 'Multiroom Link Mate',
-               'sources': ['Bluetooth', 'Wi-Fi', 'AUX', 'HDMI', 'Optical',
-                           'TV SoundConnect'],
+               'sources': ['Bluetooth', 'Wi-Fi', 'AUX', 'Optical', 'TV SoundConnect'],
                'max_api_volume': 30,
                'port': 55001,
                },
+    # Not tested or confirmed.
     'HW-H750': {'name': '4.1 Ch Soundbar H750',
                 'sources': ['Bluetooth', 'Wi-Fi', 'AUX', 'HDMI', 'Optical',
                             'TV SoundConnect', 'USB'],
