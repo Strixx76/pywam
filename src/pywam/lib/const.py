@@ -192,12 +192,12 @@ SPEAKER_MODELS: dict[str, dict[str, Any]] = {
                     'port': 55001,
                     },
     # Testing
-    'WAM270': {'name': 'Multiroom Link Mate',
-               'sources': ['Bluetooth', 'Wi-Fi', 'AUX', 'Optical',
-                           'Coaxial', 'TV SoundConnect'],
-               'max_api_volume': 30,
-               'port': 55001,
-               },
+    'SPK-WAM270': {'name': 'Multiroom Link Mate',
+                   'sources': ['Bluetooth', 'Wi-Fi', 'AUX', 'Optical',
+                               'Coaxial', 'TV SoundConnect'],
+                   'max_api_volume': 30,
+                   'port': 55001,
+                   },
     # Not tested or confirmed.
     'HW-H750': {'name': '4.1 Ch Soundbar H750',
                 'sources': ['Bluetooth', 'Wi-Fi', 'AUX', 'HDMI', 'Optical',
