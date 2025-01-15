@@ -16,7 +16,7 @@ from pywam.attributes import WamAttributes
 from pywam.lib import api_call, translate, validate
 from pywam.lib.const import APP_FEATURES, EXC_MESSAGE, Feature, SOURCE_FEATURES
 from pywam.lib.equalizer import EqualizerPreset
-from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError
+from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError, PywamError
 
 
 if TYPE_CHECKING:
@@ -41,7 +41,9 @@ def is_it_supported(func):
     @functools.wraps(func)
     def wrapper_is_it_supported(self, *args, **kwargs):
         if func.__name__ not in self.supported_features:
-            raise FeatureNotSupportedError(f'{EXC_MESSAGE[func.__name__]} is not supported in this mode.')
+            raise FeatureNotSupportedError(
+                f'{EXC_MESSAGE[func.__name__]} is not supported in this mode.'
+            )
         return func(self, *args, **kwargs)
     return wrapper_is_it_supported
 
@@ -686,3 +688,111 @@ class Speaker():
             await master.create_group(slaves, master.attribute.group_name)
         else:
             await master.client.request(api_call.set_ungroup())
+
+    async def group(self,
+                    slaves_before: list[Speaker],
+                    slaves_after: list[Speaker],
+                    group_name: str | None = None
+                    ) -> None:
+        """ Group this speaker.
+
+        Create or edit a speaker groupe. This method can only be called
+        when the speaker is already master in the the groupe or if it is
+        not in a group.
+        If the speaker is already master you must provide all the slaves
+        because the speaker is not aware of its slaves.
+
+        Arguments:
+            slaves_before:
+                List of all the slaves in the group, or empty list if
+                the speaker is not yet master.
+            slaves_after:
+                List of all the slaves in the group, or empty list if
+                the group should be deleted.
+        """
+        # Check that we have needed attributes to call grouping API
+        if (
+            self.attribute.mac is None or
+            self.attribute.name is None or
+            self.attribute.is_grouped is None
+        ):
+            raise PywamError('Speaker attributes not available')
+
+        # If this speaker is slave to another group it can't be master
+        # in a new group.
+        if self.attribute.is_slave:
+            raise PywamError('This speaker is already a slave in another group')
+
+        # Validate all slave speakers
+        slaves_before = validate.speakers(slaves_before)
+        slaves_after = validate.speakers(slaves_after)
+
+        speakers_to_add = list(set(slaves_after)-set(slaves_before))
+        speakers_to_remove = list(set(slaves_before)-set(slaves_after))
+
+        for speaker in slaves_before:
+            if speaker.attribute.master_ip != self.ip:
+                raise PywamError(f'"{speaker.attribute.name}" is not a slave in this group')
+        if self.attribute.is_grouped:
+            if len(slaves_before) + 1 != self.attribute.number_of_speakers:
+                raise PywamError('Not all speakers in group provided')
+        else:
+            if len(slaves_before) > 0:
+                raise PywamError('Speaker has no slaves now')
+
+        for speaker in speakers_to_add:
+            if speaker.attribute.is_grouped:
+                raise PywamError(f'"{speaker.attribute.name}" is already grouped')
+
+        subspeakers = []
+        for speaker in slaves_after:
+            if speaker.attribute.mac is None:
+                raise PywamError(f'"{speaker.attribute.name}" has no MAC')
+            else:
+                subspeakers.append({'ip': speaker.ip, 'mac': speaker.attribute.mac})
+
+        # Set group name
+        if not group_name:
+            group_name = f'{self.attribute.name}_group'
+        group_name = validate.name(group_name)
+
+        # Remove speakers
+        api_calls = []
+        for speaker in speakers_to_remove:
+            _LOGGER.info('Adding "%s" to be removed', speaker.attribute.name)
+            api_calls.append(speaker.client.request(api_call.set_ungroup()))
+        _LOGGER.info('Removing %s speakers from group', len(api_calls))
+        await asyncio.gather(*api_calls)
+
+        # Delete group if no slaves after
+        if len(slaves_after) == 0:
+            _LOGGER.info('Deleting group by send ungroup to master')
+            await self.client.request(api_call.set_ungroup())
+            return
+
+        # Update group
+        api = api_call.set_multispk_group_mainspk(
+            group_name,
+            len(subspeakers) + 1,
+            self.attribute.mac,
+            self.attribute.name,
+            subspeakers,
+        )
+        _LOGGER.info('Calling master with updated group info')
+        _LOGGER.info('    Subspeakers: %s', subspeakers)
+        _LOGGER.info('    Groupname: %s', group_name)
+        await self.client.request(api)
+
+        # Call added slaves
+        api_calls = []
+        for speaker in slaves_after:
+            api = api_call.set_multispk_group_subspk(
+                group_name,
+                len(subspeakers) + 1,
+                self.ip,
+                self.attribute.mac,
+            )
+            _LOGGER.info('%s will soon be called and set to slave', speaker.attribute.name)
+            api_calls.append(speaker.client.request(api))
+        _LOGGER.info('Calling all slaves with updated information')
+        await asyncio.gather(*api_calls)
