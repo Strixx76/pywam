@@ -398,6 +398,9 @@ class WamAttributes:
 
         Possible values are:  'stop' | 'play' | 'pause' | 'resume'
         """
+        # Workaround to always be able to stop URL-playback
+        if self.app_name == 'Unknown':
+            return 'play'
         return self._playstatus
 
     @ property
