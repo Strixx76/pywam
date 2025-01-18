@@ -2146,7 +2146,7 @@ class WamEvents:
         """
         self._attr._groupmainip = '0.0.0.0'
         self._attr._groupmainmacaddr = '00:00:00:00:00:00'
-        self._attr._groupspknum = '1'
+        self._attr._groupspknum = '0'
         self._attr._grouptype = 'N'
         self._attr._groupname = ''
 

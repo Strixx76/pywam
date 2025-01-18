@@ -327,8 +327,6 @@ class WamAttributes:
         """ True if the speaker is grouped. """
         if self._groupspknum is None or self._grouptype is None:
             return None
-        if self._groupspknum == '1':
-            return False
         if self._grouptype == 'N':
             return False
 
@@ -373,7 +371,14 @@ class WamAttributes:
 
     @ property
     def number_of_speakers(self) -> int | None:
-        """ Returns number of speakers in group if grouped. """
+        """ Returns number of speakers in group if grouped.
+
+        NB! This is unusable.
+
+        This is not usable because it is not always correct. If a
+        speaker drops out of the group the other speakers will not know
+        about it, and report wrong information.
+        """
         if self._groupspknum is not None:
             return int(self._groupspknum)
         return None
@@ -547,6 +552,7 @@ class WamAttributes:
             'wifi_rssi': self.wifi_rssi,
             'wifi_ssid': self.wifi_ssid,
             'clients': copy.deepcopy(self.clients),
+            'is_grouped': self.is_grouped,
             'is_master': self.is_master,
             'is_slave': self.is_slave,
             'group_name': self.group_name,

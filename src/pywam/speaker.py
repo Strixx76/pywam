@@ -106,7 +106,8 @@ class Speaker():
             return supported_features
 
         # Pause is supported by all services.
-        supported_features.extend([Feature.PAUSE])
+        # Select source is supported unless speaker is slave
+        supported_features.extend([Feature.PAUSE, Feature.SELECT_SOURCE])
 
         # If we don't know all the needed attributes, we should return now.
         if self.attribute._grouptype is None or self.attribute._function is None:
@@ -120,7 +121,7 @@ class Speaker():
 
         # If speaker is not grouped (master or slave) everything is supported
         if not self.attribute.is_master:
-            supported_features.extend([Feature.SELECT_SOURCE, Feature.SET_NAME])
+            supported_features.extend([Feature.SET_NAME])
 
         return supported_features
 
@@ -559,135 +560,6 @@ class Speaker():
     # *********************************************************************************************
     # Group
     # *********************************************************************************************
-    async def create_group(self, slaves: list[Speaker], group_name: str | None = None) -> None:
-        """ Create a speaker group.
-
-        This speaker will become the master speaker of the group, and
-        passed in list of speakers will become slaves.
-        The speakers can't already be part of another group.
-        It is up to the user to keep track of groups and group members.
-        The master knows nothing about it's slaves, only how many.
-
-        Arguments:
-            slaves:
-                A list of Speaker objects to group with this speaker.
-            group_name (opt):
-                Name of the group. If not given the groups will named as
-                master speaker with suffix '_group'.
-
-        Raises:
-            FeatureNotSupportedError if the speaker belongs to another group.
-        """
-
-        # If this speaker is slave to another group it can't be master
-        # in a new group.
-        if self.attribute.is_slave:
-            raise FeatureNotSupportedError('This speaker is already a slave in another group')
-
-        # Set group name
-        if not group_name:
-            group_name = f'{self.attribute.name}_group'
-        group_name = validate.name(group_name)
-
-        # Validate all slave speakers
-        slaves = validate.speakers(slaves)
-        subspeakers = []
-        for speaker in slaves:
-            # If a speakers already belongs to another grouped we can't
-            # add it to this group
-            if speaker.attribute.is_grouped:
-                if speaker.attribute.master_ip != self.ip:
-                    _LOGGER.error("(%s) Speaker already belongs to another group", speaker.ip)
-                    continue
-                if speaker.attribute.is_master:
-                    _LOGGER.error("(%s) Speaker already master in another group", speaker.ip)
-                    continue
-            subspeakers.append({'ip': speaker.ip, 'mac': speaker.attribute.mac})
-        if len(subspeakers) == 0:
-            raise FeatureNotSupportedError('No speakers to be group')
-
-        api = api_call.set_multispk_group_mainspk(
-            group_name,
-            len(subspeakers) + 1,
-            self.attribute.mac,
-            self.attribute.name,
-            subspeakers,
-        )
-        await self.client.request(api)
-
-        api_calls = []
-        for speaker in slaves:
-            api = api_call.set_multispk_group_subspk(
-                group_name,
-                len(subspeakers) + 1,
-                self.ip,
-                self.attribute.mac,
-            )
-            api_calls.append(speaker.client.request(api))
-        await asyncio.gather(*api_calls)
-
-    async def delete_group(self, slaves: list[Speaker]) -> None:
-        """ Delete a speaker group.
-
-        Removes this and all slave speaker from the group. All slaves
-        in the group must be passed.
-        There is no way for the master to know which speakers that
-        belong to this group. It is up to the user to keep track of this.
-
-        Arguments:
-            slaves:
-                A list of Speaker objects in current group.
-            group_name (opt):
-                Name of the group. If not given the groups will named as
-                master speaker with suffix '_group'.
-
-        Raises:
-            FeatureNotSupportedError if the speaker is not a master.
-        """
-        if not self.attribute.is_master:
-            raise FeatureNotSupportedError('This speaker is not master in any group')
-
-        slaves = validate.speakers(slaves)
-
-        api_calls = []
-        for speaker in slaves:
-            if speaker.attribute.master_ip != self.ip:
-                _LOGGER.error("(%s) is not a slave to this speaker.", speaker.ip)
-                continue
-            api_calls.append(speaker.client.request(api_call.set_ungroup()))
-
-        await asyncio.gather(*api_calls)
-        await self.client.request(api_call.set_ungroup())
-
-    async def leave_group(self, master: Speaker, slaves: list[Speaker] = []) -> None:
-        """ Leave a speaker group.
-
-        When the speaker is part of a group you call this to leave that
-        group. This can only be called if the speaker is a slave.
-
-        Arguments:
-            master:
-                Speaker object for the master of the group.
-            slaves:
-                A list of Speaker objects for all the other slaves in
-                the group to leave.
-                None if there are no other speakers in the group.
-        """
-        if not self.attribute.is_slave:
-            raise FeatureNotSupportedError('This speaker is not slave in any group')
-
-        master = validate.speakers([master])[0]
-
-        if self.attribute.master_ip != master.ip:
-            raise FeatureNotSupportedError('Given master speaker is not the master in this group')
-
-        await self.client.request(api_call.set_ungroup())
-
-        if slaves:
-            slaves = validate.speakers(slaves)
-            await master.create_group(slaves, master.attribute.group_name)
-        else:
-            await master.client.request(api_call.set_ungroup())
 
     async def group(self,
                     slaves_before: list[Speaker],
@@ -730,15 +602,12 @@ class Speaker():
         speakers_to_add = list(set(slaves_after)-set(slaves_before))
         speakers_to_remove = list(set(slaves_before)-set(slaves_after))
 
+        if not self.attribute.is_grouped and len(slaves_before) > 0:
+            raise PywamError('Speaker has no slaves now')
+
         for speaker in slaves_before:
             if speaker.attribute.master_ip != self.ip:
                 raise PywamError(f'"{speaker.attribute.name}" is not a slave in this group')
-        if self.attribute.is_grouped:
-            if len(slaves_before) + 1 != self.attribute.number_of_speakers:
-                raise PywamError('Not all speakers in group provided')
-        else:
-            if len(slaves_before) > 0:
-                raise PywamError('Speaker has no slaves now')
 
         for speaker in speakers_to_add:
             if speaker.attribute.is_grouped:
@@ -779,8 +648,8 @@ class Speaker():
             subspeakers,
         )
         _LOGGER.info('Calling master with updated group info')
-        _LOGGER.info('    Subspeakers: %s', subspeakers)
-        _LOGGER.info('    Groupname: %s', group_name)
+        _LOGGER.info(' - Subspeakers: %s', subspeakers)
+        _LOGGER.info(' - Groupname: %s', group_name)
         await self.client.request(api)
 
         # Call added slaves
