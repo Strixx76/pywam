@@ -8,7 +8,8 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
-from pywam.lib import translate
+from pywam.device import WamDevice
+from pywam.lib.const import SOURCES_BY_API
 from pywam.lib.equalizer import EqualizerPreset, EqualizerValues
 from pywam.lib.media_presets import MediaPreset
 
@@ -138,9 +139,10 @@ class WamAttributes:
             Timestamp when speaker was last heard from.
     """
 
-    def __init__(self, speaker: Speaker) -> None:
+    def __init__(self, speaker: Speaker, device: WamDevice) -> None:
 
         self._speaker = speaker
+        self._device = device
 
         # UNMODIFIED WAM ATTRIBUTES
         # Speaker attributes
@@ -271,7 +273,7 @@ class WamAttributes:
     @ property
     def model(self) -> str | None:
         """ Return speaker model. """
-        return translate.model()
+        return self._device.model
 
     @ property
     def device_id(self) -> str | None:
@@ -387,7 +389,7 @@ class WamAttributes:
     def volume(self) -> int | None:
         """ Return volume level (0-100). """
         if self._volume is not None:
-            return translate.decode_volume(int(self._volume))
+            return self._device.decode_volume(int(self._volume))
         return None
 
     @ property
@@ -423,14 +425,21 @@ class WamAttributes:
     @ property
     def source_list(self) -> list[str]:
         """ Return selectable speaker input sources. """
-        return translate.sources()
+        if self.is_grouped:
+            if self.is_master:
+                return self._device.master_sources
+            return []
+        if self.is_grouped is None:
+            return []
+
+        return self._device.sources
 
     @ property
     def source(self) -> str | None:
         """ Return current selected input source. """
         if not self._function:
             return None
-        return translate.decode_source(self._function)
+        return SOURCES_BY_API.get(self._function, 'Unknown')
 
     @ property
     def app_name(self) -> str | None:

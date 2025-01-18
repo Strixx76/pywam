@@ -11,10 +11,18 @@ import logging
 from typing import TYPE_CHECKING
 
 from pywam.client import WamClient
+from pywam.device import WamDevice, get_device_info
 from pywam.events import WamEvents
 from pywam.attributes import WamAttributes
-from pywam.lib import api_call, translate, validate
-from pywam.lib.const import APP_FEATURES, EXC_MESSAGE, Feature, SOURCE_FEATURES
+from pywam.lib import api_call, validate
+from pywam.lib.const import (
+    APP_FEATURES,
+    EXC_MESSAGE,
+    Feature,
+    SOURCES_BY_API,
+    SOURCES_BY_NAME,
+    SOURCE_FEATURES,
+)
 from pywam.lib.equalizer import EqualizerPreset
 from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError, PywamError
 
@@ -69,7 +77,8 @@ class Speaker():
         self._ip: str = validate.ip(ip)
         self._port: int = validate.port(port)
         self._user: str = validate.user(user)
-        self.attribute = WamAttributes(self)
+        self.device = WamDevice()
+        self.attribute = WamAttributes(self, self.device)
         self.events = WamEvents(self)
         self.client = WamClient(self)
 
@@ -360,7 +369,7 @@ class Speaker():
             VolumeLevel
         """
         volume = validate.volume(volume)
-        volume = translate.encode_volume(volume)
+        volume = self.device.encode_volume(volume)
         return await self.client.request(api_call.set_volume(volume))
 
     # ******************************************************************
@@ -373,12 +382,13 @@ class Speaker():
         Arguments:
             source:
                 Name of source. One of the following, depending on
-                speaker model: 'AUX', 'Bluetooth', 'HDMI', 'HDMI 1',
-                'HDMI 2', 'Optical', 'TV SoundConnect', 'Wi-Fi', 'USB'.
+                speaker model: 'AUX', 'Bluetooth', 'Coaxial', 'HDMI',
+                'HDMI 1', 'HDMI 2', 'Optical', 'TV SoundConnect',
+                'USB' or 'Wi-Fi'.
                 Available sources: :attr:`Speaker.attribute.source_list`
         """
-        source = validate.source(source, self.attribute._spkmodelname)
-        source = translate.encode_source(source)
+        source = validate.source(source, self.attribute.source_list)
+        source = SOURCES_BY_NAME[source]
         await self.client.request(api_call.set_func(source))
 
     async def select_sound_mode(self, preset: EqualizerPreset) -> None:
@@ -411,8 +421,7 @@ class Speaker():
         await self.update_speaker_settings()
 
         # Store speaker model specifics
-        if not translate._init:
-            translate.init(self.attribute._spkmodelname)
+        self.device.update_model(self.attribute._spkmodelname)
 
     async def update_speaker_info(self) -> None:
         """ Update speaker info. """
@@ -468,7 +477,8 @@ class Speaker():
         """
         response = await self.client.request(api_call.get_main_info())
         if model := response.get_key('spkmodelname'):
-            return translate.model(model)
+            device = get_device_info(model)
+            return device.name
         raise ApiCallError
 
     async def get_mute(self) -> bool:
@@ -510,7 +520,7 @@ class Speaker():
         """
         response = await self.client.request(api_call.get_func())
         if source := response.get_key('function'):
-            return translate.decode_source(source)
+            return SOURCES_BY_API.get(source, 'Unknown')
         raise ApiCallError
 
     async def get_speaker_id(self) -> str:
@@ -554,7 +564,7 @@ class Speaker():
         """
         response = await self.client.request(api_call.get_volume())
         if volume := response.get_key('volume'):
-            return translate.decode_volume(int(volume))
+            return self.device.decode_volume(int(volume))
         raise ApiCallError
 
     # *********************************************************************************************

@@ -9,7 +9,6 @@ import ipaddress
 from typing import TYPE_CHECKING
 import uuid
 
-from pywam.lib.const import SPEAKER_MODELS
 from pywam.lib.equalizer import EqualizerPreset, EqualizerValues
 from pywam.lib.media_presets import MediaPreset
 from pywam.lib.url import UrlMediaItem
@@ -265,7 +264,7 @@ def media_preset(preset: MediaPreset, preset_list: list[MediaPreset]) -> MediaPr
     raise ValueError('Preset could not be found on the speaker')
 
 
-def source(source: str, model: str | None) -> str:
+def source(source: str, source_list: list[str]) -> str:
     """ Validate source.
 
     Arguments:
@@ -273,6 +272,8 @@ def source(source: str, model: str | None) -> str:
             Source to validate
         model:
             Speaker model as WAM string
+        master:
+            Set to True if speaker is master in a group
 
     Returns:
         Validated source.
@@ -285,13 +286,8 @@ def source(source: str, model: str | None) -> str:
     """
     if not isinstance(source, str):
         raise TypeError('Source must be a string')
-    if not isinstance(model, str):
-        raise ValueError('Could not find speaker model')
-    if model not in SPEAKER_MODELS:
-        model = 'UNRECOGNIZED'
-    sources = SPEAKER_MODELS[model]['sources']
-    if source not in sources:
-        raise ValueError('Could not find selected source')
+    if source not in source_list:
+        raise ValueError('Speaker does not support this source in this mode')
     return source
 
 
