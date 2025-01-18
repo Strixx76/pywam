@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+## [0.1.0rc6] - 2025-01-18
+
 - Bug fix for new Coaxial source input
+- Improved group handling with ability to select source
+- Improved device specifics
 
 ## [0.1.0rc5] - 2025-01-15
 
@@ -51,3 +55,4 @@ with that integration, but that project has set the requirements to pywam>=0.0.1
 [0.1.0rc3]: https://github.com/Strixx76/pywam/tree/v0.1.0rc3
 [0.1.0rc4]: https://github.com/Strixx76/pywam/tree/v0.1.0rc4
 [0.1.0rc5]: https://github.com/Strixx76/pywam/tree/v0.1.0rc5
+[0.1.0rc6]: https://github.com/Strixx76/pywam/tree/v0.1.0rc6
