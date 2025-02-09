@@ -47,10 +47,10 @@ def is_it_supported(func):
     """
 
     @functools.wraps(func)
-    def wrapper_is_it_supported(self, *args, **kwargs):
+    def wrapper_is_it_supported(self: Speaker, *args, **kwargs):
         if func.__name__ not in self.supported_features:
             raise FeatureNotSupportedError(
-                f'{EXC_MESSAGE[func.__name__]} is not supported in this mode.'
+                f'({self.ip}) {EXC_MESSAGE[func.__name__]} is not supported in this mode.'
             )
         return func(self, *args, **kwargs)
     return wrapper_is_it_supported
@@ -242,7 +242,7 @@ class Speaker():
 
         # At the moment only TuneIn presets are supported.
         if preset.app != 'TuneIn':
-            raise FeatureNotSupportedError('Only TuneIn presets supported')
+            raise FeatureNotSupportedError(f'({self.ip}) Only TuneIn presets supported')
 
         if preset.kind == 'speaker':
             preset_type = 1
@@ -341,7 +341,7 @@ class Speaker():
             RepeatMode
         """
         if repeat_mode not in ['all', 'one', 'off']:
-            raise ValueError('Repeat mode not valid')
+            raise ValueError(f'({self.ip}) Repeat mode not valid')
         return await self.client.request(api_call.set_uic_repeat_mode(repeat_mode))
 
     @is_it_supported
@@ -479,7 +479,7 @@ class Speaker():
         if model := response.get_key('spkmodelname'):
             device = get_device_info(model)
             return device.name
-        raise ApiCallError
+        raise ApiCallError(f'({self.ip}) API call failed')
 
     async def get_mute(self) -> bool:
         """ Get mute state of speaker.
@@ -493,7 +493,7 @@ class Speaker():
         response = await self.client.request(api_call.get_mute())
         if mute := response.get_key('mute'):
             return (mute == 'on')
-        raise ApiCallError
+        raise ApiCallError(f'({self.ip}) API call failed')
 
     async def get_name(self) -> str:
         """ Get speaker's name.
@@ -507,7 +507,7 @@ class Speaker():
         response = await self.client.request(api_call.get_spk_name())
         if name := response.get_key('spkname'):
             return name
-        raise ApiCallError
+        raise ApiCallError(f'({self.ip}) API call failed')
 
     async def get_source(self) -> str:
         """ Get current selected source on speaker.
@@ -521,7 +521,7 @@ class Speaker():
         response = await self.client.request(api_call.get_func())
         if source := response.get_key('function'):
             return SOURCES_BY_API.get(source, 'Unknown')
-        raise ApiCallError
+        raise ApiCallError(f'({self.ip}) API call failed')
 
     async def get_speaker_id(self) -> str:
         """ Get speaker ID.
@@ -535,7 +535,7 @@ class Speaker():
         response = await self.client.request(api_call.get_device_id())
         if speaker_id := response.get_key('device_id'):
             return speaker_id
-        raise ApiCallError
+        raise ApiCallError(f'({self.ip}) API call failed')
 
     async def get_tunein_presets(self) -> list[dict[str, str]]:
         """ Get TuneIn presets stored in speaker.
@@ -551,7 +551,7 @@ class Speaker():
         if response.get_key('cpname') == 'tunein':
             return response.get_subkey('presetlist', 'preset')
         else:
-            raise ApiCallError
+            raise ApiCallError(f'({self.ip}) API call failed')
 
     async def get_volume(self) -> int:
         """ Get volume level.
@@ -565,7 +565,7 @@ class Speaker():
         response = await self.client.request(api_call.get_volume())
         if volume := response.get_key('volume'):
             return self.device.decode_volume(int(volume))
-        raise ApiCallError
+        raise ApiCallError(f'({self.ip}) API call failed')
 
     # *********************************************************************************************
     # Group
@@ -598,12 +598,12 @@ class Speaker():
             self.attribute.name is None or
             self.attribute.is_grouped is None
         ):
-            raise PywamError('Speaker attributes not available')
+            raise PywamError(f'({self.ip}) Speaker attributes not available')
 
         # If this speaker is slave to another group it can't be master
         # in a new group.
         if self.attribute.is_slave:
-            raise PywamError('This speaker is already a slave in another group')
+            raise PywamError(f'({self.ip}) This speaker is already a slave in another group')
 
         # Validate all slave speakers
         slaves_before = validate.speakers(slaves_before)
@@ -613,20 +613,20 @@ class Speaker():
         speakers_to_remove = list(set(slaves_before)-set(slaves_after))
 
         if not self.attribute.is_grouped and len(slaves_before) > 0:
-            raise PywamError('Speaker has no slaves now')
+            raise PywamError(f'({self.ip}) Speaker has no slaves now')
 
         for speaker in slaves_before:
             if speaker.attribute.master_ip != self.ip:
-                raise PywamError(f'"{speaker.attribute.name}" is not a slave in this group')
+                raise PywamError(f'"{speaker.ip}" is not a slave in this group')
 
         for speaker in speakers_to_add:
             if speaker.attribute.is_grouped:
-                raise PywamError(f'"{speaker.attribute.name}" is already grouped')
+                raise PywamError(f'"{speaker.ip}" is already grouped')
 
         subspeakers = []
         for speaker in slaves_after:
             if speaker.attribute.mac is None:
-                raise PywamError(f'"{speaker.attribute.name}" has no MAC')
+                raise PywamError(f'"{speaker.ip}" has no MAC')
             else:
                 subspeakers.append({'ip': speaker.ip, 'mac': speaker.attribute.mac})
 
@@ -638,14 +638,14 @@ class Speaker():
         # Remove speakers
         api_calls = []
         for speaker in speakers_to_remove:
-            _LOGGER.info('Adding "%s" to be removed', speaker.attribute.name)
+            _LOGGER.info('(%s) Adding "%s" to be removed', self.ip, speaker.attribute.name)
             api_calls.append(speaker.client.request(api_call.set_ungroup()))
-        _LOGGER.info('Removing %s speakers from group', len(api_calls))
+        _LOGGER.info('(%s) Removing %s speakers from group', self.ip, len(api_calls))
         await asyncio.gather(*api_calls)
 
         # Delete group if no slaves after
         if len(slaves_after) == 0:
-            _LOGGER.info('Deleting group by send ungroup to master')
+            _LOGGER.info('(%s) Deleting group by send ungroup to master', self.ip)
             await self.client.request(api_call.set_ungroup())
             return
 
@@ -657,7 +657,7 @@ class Speaker():
             self.attribute.name,
             subspeakers,
         )
-        _LOGGER.info('Calling master with updated group info')
+        _LOGGER.info('(%s) Calling master with updated group info', self.ip)
         _LOGGER.info(' - Subspeakers: %s', subspeakers)
         _LOGGER.info(' - Groupname: %s', group_name)
         await self.client.request(api)
@@ -671,7 +671,8 @@ class Speaker():
                 self.ip,
                 self.attribute.mac,
             )
-            _LOGGER.info('%s will soon be called and set to slave', speaker.attribute.name)
+            _LOGGER.info('(%s) %s will soon be called and set to slave',
+                         self.ip, speaker.attribute.name)
             api_calls.append(speaker.client.request(api))
-        _LOGGER.info('Calling all slaves with updated information')
+        _LOGGER.info('(%s) Calling all slaves with updated information', self.ip)
         await asyncio.gather(*api_calls)

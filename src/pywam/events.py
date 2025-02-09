@@ -114,7 +114,7 @@ class WamEvents:
             TypeError: If given argument is not a callable.
         """
         if not callable(callback):
-            raise TypeError('Subscriber must be a callable')
+            raise TypeError(f'({self._speaker.ip}) Subscriber must be a callable')
         info_level = is_integer(info_level, (0, 2))
         self._subscriber[callback] = info_level
 
@@ -131,7 +131,9 @@ class WamEvents:
         try:
             del self._subscriber[callback]
         except KeyError as e:
-            raise KeyError(f'{callback} is not a registered subscriber') from e
+            raise KeyError(
+                    f'({self._speaker.ip}) {callback} is not a registered subscriber'
+                ) from e
 
     # ******************************************************************
     # Speaker events

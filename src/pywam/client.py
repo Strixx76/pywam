@@ -104,11 +104,11 @@ class WamClient:
             ConnectionError: If connection is not established.
         """
         if self._connecting:
-            raise ConnectionError('Already trying to connect to speaker')
+            raise ConnectionError(f'({self._ip}) Already trying to connect to speaker')
         if self.is_connected:
-            raise ConnectionError('Already connected to speaker')
+            raise ConnectionError(f'({self._ip}) Already connected to speaker')
         if self._disconnecting:
-            raise ConnectionError('Waiting for speaker to disconnect')
+            raise ConnectionError(f'({self._ip}) Waiting for speaker to disconnect')
         self._connecting = True
 
         try:
@@ -118,19 +118,21 @@ class WamClient:
             )
         except asyncio.TimeoutError as exc:
             await self.disconnect()
-            raise ConnectionError('Timeout when trying to connect to speaker') from exc
+            raise ConnectionError(
+                    f'({self._ip}) Timeout when trying to connect to speaker'
+                ) from exc
         except Exception as exc:
             await self.disconnect()
-            raise ConnectionError('Could not connect to speaker') from exc
+            raise ConnectionError(f'({self._ip}) Could not connect to speaker') from exc
         finally:
             self._connecting = False
 
     async def start_listening(self) -> None:
         """ Start listen to events from the speaker. """
         if not self.is_connected:
-            raise ConnectionError('Not connected to the speaker')
+            raise ConnectionError(f'({self._ip}) Not connected to the speaker')
         if self._listener_task:
-            raise ConnectionError('Listener is already running')
+            raise ConnectionError(f'({self._ip}) Listener is already running')
 
         self._listener_task = asyncio.create_task(self._receive_loop())
         await self._listening.wait()
@@ -183,7 +185,7 @@ class WamClient:
             ApiCallTimeoutError: If correct response was not received.
         """
         if not self.is_connected or not self.is_listening:
-            raise ConnectionError('No connection with speaker')
+            raise ConnectionError(f'({self._ip}) No connection with speaker')
 
         # Make sure that a second call is not made until we receive a
         # correct answer or get time out on current call.
@@ -202,7 +204,7 @@ class WamClient:
             )
         except Exception as e:
             await self.disconnect()
-            raise ConnectionError('Could not connect to speaker') from e
+            raise ConnectionError(f'({self._ip}) Could not connect to speaker') from e
 
         # Send to the speaker.
         request = f'GET {api_call.url}{self._http_request}'
@@ -220,9 +222,9 @@ class WamClient:
                 self._wait_for_response(api_call),
                 timeout=self._request_timeout * api_call.timeout_multiple)
         except asyncio.TimeoutError:
-            raise ApiCallTimeoutError('No response from speaker')
+            raise ApiCallTimeoutError(f'({self._ip}) No response from speaker')
         except Exception as e:
-            raise ApiCallTimeoutError('Error while waiting for response') from e
+            raise ApiCallTimeoutError(f'({self._ip}) Error while waiting for response') from e
         finally:
             # Reset writer and queue
             writer.close()
@@ -321,7 +323,7 @@ class WamClient:
                 response in.
         """
         if not self._response_queue:
-            raise RuntimeError('asyncio.Queue not initialized')
+            raise RuntimeError(f'({self._ip}) asyncio.Queue not initialized')
         while True:
             api_response = await self._response_queue.get()
             if api_response.method != api_call.expected_response:
@@ -361,7 +363,7 @@ class WamClient:
             TypeError: If given argument is not a callable.
         """
         if not callable(callback):
-            raise TypeError('Subscriber must be a callable')
+            raise TypeError(f'({self._ip}) Subscriber must be a callable')
         self._subscribers.add(callback)
 
     def unregister_subscriber(self, callback: Callable) -> None:
