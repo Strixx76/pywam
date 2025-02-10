@@ -70,7 +70,6 @@ SPEAKER_MODELS: dict[str, dict[str, Any]] = {
     'SPK-WAM7501': {'name': 'Wireless Audio 360 - R7',
                     'sources': ['Bluetooth', 'Wi-Fi', 'TV SoundConnect'],
                     },
-    # Testing
     'SPK-WAM270': {'name': 'Multi room Link Mate',
                    'sources': ['Bluetooth', 'Wi-Fi', 'AUX', 'Optical',
                                'Coaxial', 'TV SoundConnect'],
