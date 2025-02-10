@@ -247,7 +247,7 @@ def get_device_info(device: str | None = None) -> DeviceInfo:
     return DeviceInfo(**SPEAKER_MODELS[device])
 
 
-@ dataclass
+@dataclass
 class DeviceInfo:
     """ Stores info about a device. """
     name: str
@@ -264,7 +264,7 @@ class WamDevice:
         """ Initialize the device with the given model. """
         self._device_info = get_device_info()
 
-    @ property
+    @property
     def model(self) -> str:
         """ Return speaker model name. """
         return self._device_info.name

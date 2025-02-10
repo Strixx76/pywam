@@ -260,57 +260,57 @@ class WamAttributes:
             '_last_seen': self._last_seen,
         }
 
-    @ property
+    @property
     def name(self) -> str | None:
         """ Return speaker's name. """
         return self._spkname
 
-    @ property
+    @property
     def mac(self) -> str | None:
         """ Return speaker network adaptor mac address. """
         return self._spkmacaddr
 
-    @ property
+    @property
     def model(self) -> str | None:
         """ Return speaker model. """
         return self._device.model
 
-    @ property
+    @property
     def device_id(self) -> str | None:
         """ Return speaker ID. """
         return self._device_id
 
-    @ property
+    @property
     def bt_mac(self) -> str | None:
         """ Return speaker BT mac address. """
         return self._btmacaddr
 
-    @ property
+    @property
     def software_version(self) -> str | None:
         """ Return software version on speaker. """
         return self._displayversion
 
-    @ property
+    @property
     def connection_type(self) -> str | None:
         """ Return type of network connection. """
         return self._connectiontype
 
-    @ property
+    @property
     def wifi_channel(self) -> str | None:
         """ Return WiFi channel if connect with WiFi. """
         return self._ch
 
-    @ property
+    @property
     def wifi_rssi(self) -> str | None:
         """ Return RSSI (0-5)? if connect with WiFi. """
         return self._rssi
 
-    @ property
+    @property
     def wifi_ssid(self) -> str | None:
         """ Return SSID if connect with WiFi. """
         return self._ssid
 
-    @ property
+    @property
     def clients(self) -> dict[str, str] | None:
         """ Return a dictionary of connected clients.
 
@@ -334,26 +334,26 @@ class WamAttributes:
 
         return True
 
-    @ property
+    @property
     def is_master(self) -> bool | None:
         """ True if the speaker is master in a group. """
         if not self._grouptype:
             return None
         return (self._grouptype == 'M')
 
-    @ property
+    @property
     def is_slave(self) -> bool | None:
         """ True if the speaker is slave in a group. """
         if not self._grouptype:
             return None
         return (self._grouptype == 'S')
 
-    @ property
+    @property
     def group_name(self) -> str | None:
         """ Return group's name. """
         return self._groupname
 
-    @ property
+    @property
     def master_ip(self) -> str | None:
         """ Returns masters IP address if slave and grouped.. """
         # When master it could either be own IP or None depending on
@@ -362,7 +362,7 @@ class WamAttributes:
             return self._groupmainip
         return None
 
-    @ property
+    @property
     def master_mac(self) -> str | None:
         """ Returns masters MAC address if speaker is grouped. """
         # When master it could either be own MAC or None depending on
@@ -371,7 +371,7 @@ class WamAttributes:
             return self._groupmainmacaddr
         return None
 
-    @ property
+    @property
     def number_of_speakers(self) -> int | None:
         """ Returns number of speakers in group if grouped.
 
@@ -385,21 +385,21 @@ class WamAttributes:
             return int(self._groupspknum)
         return None
 
-    @ property
+    @property
     def volume(self) -> int | None:
         """ Return volume level (0-100). """
         if self._volume is not None:
             return self._device.decode_volume(int(self._volume))
         return None
 
-    @ property
+    @property
     def muted(self) -> bool | None:
         """ Return True if speaker is muted. """
         if not self._mute:
             return None
         return (self._mute == 'on')
 
-    @ property
+    @property
     def state(self) -> str | None:
         """ Return speaker state.
 
@@ -410,19 +410,19 @@ class WamAttributes:
             return 'play'
         return self._playstatus
 
-    @ property
+    @property
     def repeat_mode(self) -> str | None:
         """ Return current repeat mode. ('all'|'one'|'off'). """
         return self._repeat
 
-    @ property
+    @property
     def shuffle_mode(self) -> bool | None:
         """ Return current shuffle mode. """
         if not self._shuffle:
             return None
         return (self._shuffle == 'on')
 
-    @ property
+    @property
     def source_list(self) -> list[str]:
         """ Return selectable speaker input sources. """
         if self.is_grouped:
@@ -434,14 +434,14 @@ class WamAttributes:
 
         return self._device.sources
 
-    @ property
+    @property
     def source(self) -> str | None:
         """ Return current selected input source. """
         if not self._function:
             return None
         return SOURCES_BY_API.get(self._function, 'Unknown')
 
-    @ property
+    @property
     def app_name(self) -> str | None:
         """ Return name of the current playing app."""
         # Only on WiFi apps can be playing
@@ -457,34 +457,34 @@ class WamAttributes:
 
         return None
 
-    @ property
+    @property
     def media_title(self) -> str | None:
         """ Return title of media, radio station or connected BT device. """
         return self._title or self._devicename
 
-    @ property
+    @property
     def media_artist(self) -> str | None:
         """ Return artist or description of radio station. """
         return self._artist or self._description
 
-    @ property
+    @property
     def media_album_name(self) -> str | None:
         """ Return album name of current playing media. """
         return self._album
 
-    @ property
+    @property
     def media_album_artist(self) -> str | None:
         """ Return album artist of current playing media. """
         # TODO: Implement
         return None
 
-    @ property
+    @property
     def media_track(self) -> int | None:
         """ Return track number of current playing media. """
         # TODO: Implement
         return None
 
-    @ property
+    @property
     def media_image_url(self) -> str | None:
         """ Return url to image fo current playing media. """
         if self._thumbnail:
@@ -492,7 +492,7 @@ class WamAttributes:
                 return self._thumbnail
         return None
 
-    @ property
+    @property
     def media_duration(self) -> int | None:
         """ Return duration of current playing media in seconds. """
         if self._tracklength:
@@ -500,25 +500,25 @@ class WamAttributes:
         else:
             return None
 
-    @ property
+    @property
     def media_position(self) -> int | None:
         """ Return position of current playing media in seconds. """
         # TODO: Implement
         return None
 
-    @ property
+    @property
     def sound_mode_list(self) -> list[EqualizerPreset]:
         """ Return equalizer presets stored on speaker. """
         if not self._eqmode_presetlist:
             return []
         return [EqualizerPreset(**preset) for preset in self._eqmode_presetlist]
 
-    @ property
+    @property
     def sound_mode(self) -> str | None:
         """ Return name of current used equalizer values. """
         return self._presetname
 
-    @ property
+    @property
     def equalizer_values(self) -> EqualizerValues | None:
         """ Return current equalizer values. """
         eqvalues = {'hz_150': self._eqvalue1,
@@ -534,7 +534,7 @@ class WamAttributes:
 
         return EqualizerValues(**eqvalues)  # type: ignore
 
-    @ property
+    @property
     def tunein_presets(self) -> list[MediaPreset]:
         """ Return TuneIn presets stored in speaker. """
         if not self._media_presetlist:
@@ -542,7 +542,7 @@ class WamAttributes:
         app = 'TuneIn'
         return [MediaPreset(cpname=app, **preset) for preset in self._media_presetlist[app]]
 
-    @ property
+    @property
     def last_seen(self) -> datetime | None:
         """ When was the speaker last seen. """
         return self._last_seen
