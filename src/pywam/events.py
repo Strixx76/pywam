@@ -10,11 +10,12 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
-from pywam.lib.validate import is_integer
 from pywam.lib.helpers import listify
+from pywam.lib.validate import is_integer
 
 if TYPE_CHECKING:
     from pywam.lib.api_response import ApiResponse
@@ -32,12 +33,13 @@ class WamEvents:
     """
 
     def __init__(self, speaker: Speaker):
+        """ Create a WamEvents object. """
         self._attr = speaker.attribute
         self._speaker = speaker
         self._subscriber: dict[Callable, int] = {}
         self._latest_known_state: dict = self._attr.get_state_copy()
 
-    def receiver(self, event: 'ApiResponse') -> None:
+    def receiver(self, event: ApiResponse) -> None:
         """ Receives events from WamClient.
 
         Arguments:
@@ -69,7 +71,7 @@ class WamEvents:
     # Methods for handling event subscriber
     # ******************************************************************
 
-    def _dispatch_event(self, used: bool, event: 'ApiResponse') -> None:
+    def _dispatch_event(self, used: bool, event: ApiResponse) -> None:
         """ Send events to subscriber. """
         for subscriber, info_level in self._subscriber.items():
             try:
@@ -143,7 +145,7 @@ class WamEvents:
     # PowerStatus, RearLevel, ToggleShuffle, AmazonCpSelected, SkipInfo
     # SubMenu, ErrorEvent, RadioPlayList
 
-    def event_7BandEQList(self, event: 'ApiResponse') -> bool:
+    def event_7BandEQList(self, event: ApiResponse) -> bool:
         """ List of all equalizer presets on the speaker.
 
         method (str): '7BandEQList'
@@ -171,8 +173,8 @@ class WamEvents:
         self._attr._eqmode_presetlist = listify(event.get_subkey('presetlist', 'preset'))
         return True
 
-    def event_7bandEQMode(self, event: 'ApiResponse') -> bool:
-        """ Current EQ settings for speaker.
+    def event_7bandEQMode(self, event: ApiResponse) -> bool:
+        """ Set current EQ settings for speaker.
 
         Same attributes as 'CurrentEQMode'. Don't know when which is
         sent.
@@ -215,8 +217,8 @@ class WamEvents:
         self._attr._eqvalue7 = event.get_key('eqvalue7')
         return True
 
-    def event_7bandEQValue(self, event: 'ApiResponse') -> bool:
-        """ Current EQ settings for speaker.
+    def event_7bandEQValue(self, event: ApiResponse) -> bool:
+        """ Set current EQ settings for speaker.
 
         This one is sent when current setting is not an preset.
 
@@ -256,7 +258,7 @@ class WamEvents:
         self._attr._eqvalue7 = event.get_key('eqvalue7')
         return True
 
-    def event_AcmMode(self, event: 'ApiResponse') -> bool:
+    def event_AcmMode(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AcmMode'
@@ -274,7 +276,7 @@ class WamEvents:
         """
         return False
 
-    def event_AddCustomEQMode(self, event: 'ApiResponse') -> bool:
+    def event_AddCustomEQMode(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AddCustomEQMode'
@@ -290,7 +292,7 @@ class WamEvents:
         """
         return False
 
-    def event_AddSongsToMultiQueueResult(self, event: 'ApiResponse') -> bool:
+    def event_AddSongsToMultiQueueResult(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AddSongsToMultiQueueResult'
@@ -309,7 +311,7 @@ class WamEvents:
         """
         return False
 
-    def event_AlarmInfo(self, event: 'ApiResponse') -> bool:
+    def event_AlarmInfo(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AlarmInfo'
@@ -336,7 +338,7 @@ class WamEvents:
         """
         return False
 
-    def event_AlarmOnOff(self, event: 'ApiResponse') -> bool:
+    def event_AlarmOnOff(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AlarmOnOff'
@@ -352,7 +354,7 @@ class WamEvents:
         """
         return False
 
-    def event_AlarmSoundList(self, event: 'ApiResponse') -> bool:
+    def event_AlarmSoundList(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AlarmSoundList'
@@ -372,7 +374,7 @@ class WamEvents:
         """
         return False
 
-    def event_AllAlarmInfo(self, event: 'ApiResponse') -> bool:
+    def event_AllAlarmInfo(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AllAlarmInfo'
@@ -417,7 +419,7 @@ class WamEvents:
         """
         return False
 
-    def event_ApInfo(self, event: 'ApiResponse') -> bool:
+    def event_ApInfo(self, event: ApiResponse) -> bool:
         """ Information about network connection.
 
         method (str): 'ApInfo'
@@ -452,7 +454,7 @@ class WamEvents:
         self._attr._ssid = event.get_key('ssid')
         return False
 
-    def event_AudioUI(self, event: 'ApiResponse') -> bool:
+    def event_AudioUI(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AudioUI'
@@ -467,7 +469,7 @@ class WamEvents:
         """
         return False
 
-    def event_AutoUpdate(self, event: 'ApiResponse') -> bool:
+    def event_AutoUpdate(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AutoUpdate'
@@ -482,7 +484,7 @@ class WamEvents:
         """
         return False
 
-    def event_AvSourceAll(self, event: 'ApiResponse') -> bool:
+    def event_AvSourceAll(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'AvSourceAll'
@@ -498,7 +500,7 @@ class WamEvents:
         """
         return False
 
-    def event_AvSourceAddedEvent(self, event: 'ApiResponse') -> bool:
+    def event_AvSourceAddedEvent(self, event: ApiResponse) -> bool:
         """ Found new AV-source on the network.
 
         method (str): 'AvSourceAddedEvent'
@@ -524,7 +526,7 @@ class WamEvents:
         """
         return False
 
-    def event_AvSourceDeletedEvent(self, event: 'ApiResponse') -> bool:
+    def event_AvSourceDeletedEvent(self, event: ApiResponse) -> bool:
         """ AV-source disappeared from on the network.
 
         method (str): 'AvSourceDeletedEvent'
@@ -548,7 +550,7 @@ class WamEvents:
         """
         return False
 
-    def event_BatteryStatus(self, event: 'ApiResponse') -> bool:
+    def event_BatteryStatus(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'BatteryStatus'
@@ -564,7 +566,7 @@ class WamEvents:
         """
         return False
 
-    def event_ChVolMultich(self, event: 'ApiResponse') -> bool:
+    def event_ChVolMultich(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'ChVolMultich'
@@ -579,7 +581,7 @@ class WamEvents:
         """
         return False
 
-    def event_ConnectionStatus(self, event: 'ApiResponse') -> bool:
+    def event_ConnectionStatus(self, event: ApiResponse) -> bool:
         """ Device connected to speaker.
 
         Sent when a Bluetooth device connects to or disconnects from
@@ -608,7 +610,7 @@ class WamEvents:
         self._attr._function = event.get_key('function')
         return True
 
-    def event_CpChanged(self, event: 'ApiResponse') -> bool:
+    def event_CpChanged(self, event: ApiResponse) -> bool:
         """ Another cp service was selected.
 
         Sent when a new cp is selected for browsing or searching.
@@ -625,8 +627,8 @@ class WamEvents:
         """
         return False
 
-    def event_CpInfo(self, event: 'ApiResponse') -> bool:
-        """ Currently selected cp service.
+    def event_CpInfo(self, event: ApiResponse) -> bool:
+        """ Set currently selected cp service.
 
         The cpm app selected for doing operations, and not what is
         playing on the speaker. You could have 'Spotify' selected and at
@@ -667,7 +669,7 @@ class WamEvents:
         """
         return False
 
-    def event_CpList(self, event: 'ApiResponse') -> bool:
+    def event_CpList(self, event: ApiResponse) -> bool:
         """ List all available music service providers.
 
         method (str): 'CpList'
@@ -691,8 +693,8 @@ class WamEvents:
         """
         return False
 
-    def event_CurrentEQMode(self, event: 'ApiResponse') -> bool:
-        """ Current EQ settings for speaker.
+    def event_CurrentEQMode(self, event: ApiResponse) -> bool:
+        """ Set current EQ settings for speaker.
 
         Same as attributes as '7bandEQMode'. Don't know when which is
         sent.
@@ -735,8 +737,8 @@ class WamEvents:
         self._attr._eqvalue7 = event.get_key('eqvalue7')
         return True
 
-    def event_CurrentFunc(self, event: 'ApiResponse') -> bool:
-        """ Current selected source for the speaker.
+    def event_CurrentFunc(self, event: ApiResponse) -> bool:
+        """ Set urrent selected source for the speaker.
 
         Sent when asked for (´GetFunc´) or when changed (´SetFunc´).
 
@@ -775,7 +777,7 @@ class WamEvents:
         self._attr._devicename = event.get_key('devicename')
         return True
 
-    def event_DelAlarm(self, event: 'ApiResponse') -> bool:
+    def event_DelAlarm(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'DelAlarm'
@@ -792,7 +794,7 @@ class WamEvents:
         """
         return False
 
-    def event_DelCustomEQMode(self, event: 'ApiResponse') -> bool:
+    def event_DelCustomEQMode(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'DelCustomEQMode'
@@ -808,7 +810,7 @@ class WamEvents:
         """
         return False
 
-    def event_DelSongsFromMultiQueueResult(self, event: 'ApiResponse') -> bool:
+    def event_DelSongsFromMultiQueueResult(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'DelSongsFromMultiQueueResult'
@@ -827,7 +829,7 @@ class WamEvents:
         """
         return False
 
-    def event_DeviceId(self, event: 'ApiResponse') -> bool:
+    def event_DeviceId(self, event: ApiResponse) -> bool:
         """ Device ID.
 
         Speaker has three different ID.
@@ -851,7 +853,7 @@ class WamEvents:
         self._attr._device_id = event.get_key('device_id')
         return True
 
-    def event_DMSAddedEvent(self, event: 'ApiResponse') -> bool:
+    def event_DMSAddedEvent(self, event: ApiResponse) -> bool:
         """ UIC - New DLNA server discovered.
 
         method (str): 'DMSAddedEvent'
@@ -865,7 +867,7 @@ class WamEvents:
         """
         return False
 
-    def event_DMSDeletedEvent(self, event: 'ApiResponse') -> bool:
+    def event_DMSDeletedEvent(self, event: ApiResponse) -> bool:
         """ UIC - DLNA removed from network.
 
         method (str): 'DMSDeletedEvent'
@@ -880,7 +882,7 @@ class WamEvents:
         """
         return False
 
-    def event_DmsList(self, event: 'ApiResponse') -> bool:
+    def event_DmsList(self, event: ApiResponse) -> bool:
         """ UIC - DLNA servers found by the speaker.
 
         List all dlna music servers found by the speaker.
@@ -909,7 +911,7 @@ class WamEvents:
         """
         return False
 
-    def event_EndPlaybackEvent(self, event: 'ApiResponse') -> bool:
+    def event_EndPlaybackEvent(self, event: ApiResponse) -> bool:
         """ Start playback.
 
         Sent when stopping playback on the speaker.
@@ -929,7 +931,7 @@ class WamEvents:
         self._attr._playstatus = 'stop'
         return True
 
-    def event_EQDrc(self, event: 'ApiResponse') -> bool:
+    def event_EQDrc(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'EQDrc'
@@ -946,7 +948,7 @@ class WamEvents:
         """
         return False
 
-    def event_EQMode(self, event: 'ApiResponse') -> bool:
+    def event_EQMode(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'EQMode'
@@ -969,7 +971,7 @@ class WamEvents:
         """
         return False
 
-    def event_GlobalSearch(self, event: 'ApiResponse') -> bool:
+    def event_GlobalSearch(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'GlobalSearch'
@@ -982,7 +984,7 @@ class WamEvents:
         """
         return False
 
-    def event_GroupName(self, event: 'ApiResponse') -> bool:
+    def event_GroupName(self, event: ApiResponse) -> bool:
         """ Name of speaker group.
 
         method (str): 'GroupName'
@@ -1000,7 +1002,7 @@ class WamEvents:
         self._attr._groupname = event.get_key('groupname')
         return True
 
-    def event_IpInfo(self, event: 'ApiResponse') -> bool:
+    def event_IpInfo(self, event: ApiResponse) -> bool:
         """ List of all connected clients.
 
         method (str): 'IpInfo'
@@ -1023,7 +1025,7 @@ class WamEvents:
         self._attr._iptable = listify(event.get_subkey('iptablelist', 'iptable'))
         return True
 
-    def event_KPIValue(self, event: 'ApiResponse') -> bool:
+    def event_KPIValue(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'KPIValue'
@@ -1038,7 +1040,7 @@ class WamEvents:
         """
         return False
 
-    def event_LastMusicEvent(self, event: 'ApiResponse') -> bool:
+    def event_LastMusicEvent(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'LastMusicEvent'
@@ -1051,7 +1053,7 @@ class WamEvents:
         """
         return False
 
-    def event_LedStatus(self, event: 'ApiResponse') -> bool:
+    def event_LedStatus(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'LedStatus'
@@ -1066,7 +1068,7 @@ class WamEvents:
         """
         return False
 
-    def event_LocaleChange(self, event: 'ApiResponse') -> bool:
+    def event_LocaleChange(self, event: ApiResponse) -> bool:
         """ Location changed.
 
         Sent when the location is change. Is used when browse and search
@@ -1084,8 +1086,8 @@ class WamEvents:
         """
         return False
 
-    def event_MainInfo(self, event: 'ApiResponse') -> bool:
-        """ Main information about speaker.
+    def event_MainInfo(self, event: ApiResponse) -> bool:
+        """ Receive Main information about speaker.
 
         Sent as second response on API call ´GetMainInfo´.
 
@@ -1140,7 +1142,7 @@ class WamEvents:
         self._attr._grouptype = event.get_key('grouptype', self._attr._grouptype)
         return True
 
-    def event_MediaBufferEndEvent(self, event: 'ApiResponse') -> bool:
+    def event_MediaBufferEndEvent(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'MediaBufferEndEvent'
@@ -1155,7 +1157,7 @@ class WamEvents:
         """
         return False
 
-    def event_MediaBufferStartEvent(self, event: 'ApiResponse') -> bool:
+    def event_MediaBufferStartEvent(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'MediaBufferStartEvent'
@@ -1170,7 +1172,7 @@ class WamEvents:
         """
         return False
 
-    def event_MultiHopInfo(self, event: 'ApiResponse') -> bool:
+    def event_MultiHopInfo(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'MultiHopInfo'
@@ -1188,7 +1190,7 @@ class WamEvents:
         """
         return False
 
-    def event_MultiQueueList(self, event: 'ApiResponse') -> bool:
+    def event_MultiQueueList(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'MultiQueueList'
@@ -1228,7 +1230,7 @@ class WamEvents:
         """
         return False
 
-    def event_MultichGroup(self, event: 'ApiResponse') -> bool:
+    def event_MultichGroup(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'MultichGroup'
@@ -1260,7 +1262,7 @@ class WamEvents:
         """
         return False
 
-    def event_MultispkGroup(self, event: 'ApiResponse') -> bool:
+    def event_MultispkGroup(self, event: ApiResponse) -> bool:
         """ Information about multi speaker groups.
 
         method (str): 'MultispkGroup'
@@ -1319,7 +1321,7 @@ class WamEvents:
         self._attr._groupname = event.get_key('groupname')
         return True
 
-    def event_MultispkGroupStartEvent(self, event: 'ApiResponse') -> bool:
+    def event_MultispkGroupStartEvent(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'MultispkGroupStartEvent'
@@ -1335,7 +1337,7 @@ class WamEvents:
         """
         return False
 
-    def event_MusicInfo(self, event: 'ApiResponse') -> bool:
+    def event_MusicInfo(self, event: ApiResponse) -> bool:
         """ Information about what is playing.
 
         This is for UIC, eg DLNA.
@@ -1402,7 +1404,7 @@ class WamEvents:
 
         return True
 
-    def event_MusicList(self, event: 'ApiResponse') -> bool:
+    def event_MusicList(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'MusicList'
@@ -1438,7 +1440,7 @@ class WamEvents:
         """
         return False
 
-    def event_MusicPlayTime(self, event: 'ApiResponse') -> bool:
+    def event_MusicPlayTime(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'MusicPlayTime'
@@ -1454,7 +1456,7 @@ class WamEvents:
         """
         return False
 
-    def event_MuteStatus(self, event: 'ApiResponse') -> bool:
+    def event_MuteStatus(self, event: ApiResponse) -> bool:
         """ Mute state of the speaker.
 
         Sent when asked for (´GetMute´) or when changed (´SetMute´).
@@ -1474,7 +1476,7 @@ class WamEvents:
         self._attr._mute = event.get_key('mute')
         return True
 
-    def event_PausePlaybackEvent(self, event: 'ApiResponse') -> bool:
+    def event_PausePlaybackEvent(self, event: ApiResponse) -> bool:
         """ Playback paused.
 
         Sometimes sent when pausing playback on the speaker.
@@ -1494,7 +1496,7 @@ class WamEvents:
         self._attr._playstatus = 'pause'
         return True
 
-    def event_PlayStatus(self, event: 'ApiResponse') -> bool:
+    def event_PlayStatus(self, event: ApiResponse) -> bool:
         """ Play status.
 
         method (str): 'PlayStatus'
@@ -1534,7 +1536,7 @@ class WamEvents:
 
         return True
 
-    def event_PlaybackStatus(self, event: 'ApiResponse') -> bool:
+    def event_PlaybackStatus(self, event: ApiResponse) -> bool:
         """ Playback status.
 
         method (str): 'PlaybackStatus'
@@ -1577,7 +1579,7 @@ class WamEvents:
 
         return True
 
-    def event_PresetList(self, event: 'ApiResponse') -> bool:
+    def event_PresetList(self, event: ApiResponse) -> bool:
         """ Presets stored in speaker.
 
         List of presets stored on the speaker.
@@ -1628,8 +1630,8 @@ class WamEvents:
                 return True
         return False
 
-    def event_QueryList(self, event: 'ApiResponse') -> bool:
-        """ When searching TuneIn
+    def event_QueryList(self, event: ApiResponse) -> bool:
+        """ Receive search result for TuneIn.
 
         method (str): 'QueryList'
         type: (str): 'CPM'
@@ -1660,7 +1662,7 @@ class WamEvents:
         """
         return False
 
-    def event_RadioInfo(self, event: 'ApiResponse') -> bool:
+    def event_RadioInfo(self, event: ApiResponse) -> bool:
         """ Information about what is playing.
 
         This is for CPM apps. (TuneIn, Spotify ...)
@@ -1729,7 +1731,7 @@ class WamEvents:
 
         return True
 
-    def event_RadioList(self, event: 'ApiResponse') -> bool:
+    def event_RadioList(self, event: ApiResponse) -> bool:
         """ When browsing TuneIn.
 
         method (str): 'RadioList'
@@ -1781,7 +1783,7 @@ class WamEvents:
         """
         return False
 
-    def event_RadioSelected(self, event: 'ApiResponse') -> bool:
+    def event_RadioSelected(self, event: ApiResponse) -> bool:
         """ Radio (TuneIn) is selected.
 
         This event has no speaker state attributes!
@@ -1817,7 +1819,7 @@ class WamEvents:
         """
         return False
 
-    def event_RepeatMode(self, event: 'ApiResponse') -> bool:
+    def event_RepeatMode(self, event: ApiResponse) -> bool:
         """ Repeat mode.
 
         method (str): 'RepeatMode'
@@ -1836,7 +1838,7 @@ class WamEvents:
         self._attr._repeat = event.get_key('repeat')
         return True
 
-    def event_RequestDeviceInfo(self, event: 'ApiResponse') -> bool:
+    def event_RequestDeviceInfo(self, event: ApiResponse) -> bool:
         """ Empty message.
 
         Sent as first repsonse to API call ´GetMainInfo´.
@@ -1851,7 +1853,7 @@ class WamEvents:
         """
         return False
 
-    def event_Reset7bandEQValue(self, event: 'ApiResponse') -> bool:
+    def event_Reset7bandEQValue(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'Reset7bandEQValue'
@@ -1873,7 +1875,7 @@ class WamEvents:
         """
         return False
 
-    def event_SavePreset(self, event: 'ApiResponse') -> bool:
+    def event_SavePreset(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'SavePreset'
@@ -1893,8 +1895,8 @@ class WamEvents:
         """
         return False
 
-    def event_SelectCpService(self, event: 'ApiResponse') -> bool:
-        """ Selected cp service.
+    def event_SelectCpService(self, event: ApiResponse) -> bool:
+        """ Set selected cp service.
 
         - Seems to be emitted when apps other than TuneIn is selected
           for browsing. Has nothing to do with what is playing.
@@ -1925,7 +1927,7 @@ class WamEvents:
             return True
         return False
 
-    def event_ShuffleMode(self, event: 'ApiResponse') -> bool:
+    def event_ShuffleMode(self, event: ApiResponse) -> bool:
         """ Shuffle mode.
 
         method (str): 'ShuffleMode'
@@ -1943,7 +1945,7 @@ class WamEvents:
         self._attr._shuffle = event.get_key('shuffle')
         return True
 
-    def event_SleepTime(self, event: 'ApiResponse') -> bool:
+    def event_SleepTime(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'SleepTime'
@@ -1959,7 +1961,7 @@ class WamEvents:
         """
         return False
 
-    def event_SoftwareVersion(self, event: 'ApiResponse') -> bool:
+    def event_SoftwareVersion(self, event: ApiResponse) -> bool:
         """ Firmware version on speaker.
 
         method (str): 'SoftwareVersion'
@@ -1979,7 +1981,7 @@ class WamEvents:
         self._attr._displayversion = event.get_key('displayversion')
         return True
 
-    def event_SpeakerBuyer(self, event: 'ApiResponse') -> bool:
+    def event_SpeakerBuyer(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'SpeakerBuyer'
@@ -1994,7 +1996,7 @@ class WamEvents:
         """
         return False
 
-    def event_SpeakerTime(self, event: 'ApiResponse') -> bool:
+    def event_SpeakerTime(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'SpeakerTime'
@@ -2014,7 +2016,7 @@ class WamEvents:
         """
         return False
 
-    def event_SpeakerWifiRegion(self, event: 'ApiResponse') -> bool:
+    def event_SpeakerWifiRegion(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'SpeakerWifiRegion'
@@ -2029,7 +2031,7 @@ class WamEvents:
         """
         return False
 
-    def event_SpkName(self, event: 'ApiResponse') -> bool:
+    def event_SpkName(self, event: ApiResponse) -> bool:
         """ Speaker name.
 
         Sent when speaker name is asked for (´GetSpkName´)
@@ -2050,7 +2052,7 @@ class WamEvents:
         self._attr._spkname = event.get_key('spkname')
         return True
 
-    def event_StartPlaybackEvent(self, event: 'ApiResponse') -> bool:
+    def event_StartPlaybackEvent(self, event: ApiResponse) -> bool:
         """ Start playback.
 
         Sent when starting playback on the speaker.
@@ -2070,7 +2072,7 @@ class WamEvents:
         self._attr._playstatus = 'play'
         return True
 
-    def event_StationData(self, event: 'ApiResponse') -> bool:
+    def event_StationData(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'StationData'
@@ -2092,7 +2094,7 @@ class WamEvents:
         """
         return False
 
-    def event_StopPlaybackEvent(self, event: 'ApiResponse') -> bool:
+    def event_StopPlaybackEvent(self, event: ApiResponse) -> bool:
         """ Stop playback.
 
         Sometimes sent when stopping playback on the speaker.
@@ -2112,7 +2114,7 @@ class WamEvents:
         self._attr._playstatus = 'stop'
         return True
 
-    def event_SubSoftwareVersion(self, event: 'ApiResponse') -> bool:
+    def event_SubSoftwareVersion(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'SubSoftwareVersion'
@@ -2131,7 +2133,7 @@ class WamEvents:
         """
         return False
 
-    def event_Ungroup(self, event: 'ApiResponse') -> bool:
+    def event_Ungroup(self, event: ApiResponse) -> bool:
         """ Speaker is ungrouped.
 
         Sent when a a group is cancelled.
@@ -2154,7 +2156,7 @@ class WamEvents:
 
         return True
 
-    def event_UniversalSearchMusicList(self, event: 'ApiResponse') -> bool:
+    def event_UniversalSearchMusicList(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'UniversalSearchMusicList'
@@ -2204,7 +2206,7 @@ class WamEvents:
         """
         return False
 
-    def event_UrlPlayback(self, event: 'ApiResponse') -> bool:
+    def event_UrlPlayback(self, event: ApiResponse) -> bool:
         """ Url playing.
 
         method (str): 'UrlPlayback'
@@ -2229,7 +2231,7 @@ class WamEvents:
         self._attr._cpname = 'Unknown'
         return True
 
-    def event_ValidAppVersion(self, event: 'ApiResponse') -> bool:
+    def event_ValidAppVersion(self, event: ApiResponse) -> bool:
         """ ????.
 
         method (str): 'ValidAppVersion'
@@ -2245,7 +2247,7 @@ class WamEvents:
         """
         return False
 
-    def event_VolumeLevel(self, event: 'ApiResponse') -> bool:
+    def event_VolumeLevel(self, event: ApiResponse) -> bool:
         """ Speaker volume level.
 
         Sent when asked (´GetVolume´) for or

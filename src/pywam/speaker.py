@@ -10,22 +10,21 @@ import functools
 import logging
 from typing import TYPE_CHECKING
 
+from pywam.attributes import WamAttributes
 from pywam.client import WamClient
 from pywam.device import WamDevice, get_device_info
 from pywam.events import WamEvents
-from pywam.attributes import WamAttributes
 from pywam.lib import api_call, validate
 from pywam.lib.const import (
     APP_FEATURES,
     EXC_MESSAGE,
-    Feature,
+    SOURCE_FEATURES,
     SOURCES_BY_API,
     SOURCES_BY_NAME,
-    SOURCE_FEATURES,
+    Feature,
 )
 from pywam.lib.equalizer import EqualizerPreset
 from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError, PywamError
-
 
 if TYPE_CHECKING:
     from pywam.lib.api_response import ApiResponse
@@ -56,7 +55,7 @@ def is_it_supported(func):
     return wrapper_is_it_supported
 
 
-class Speaker():
+class Speaker:
     """ Represents a Samsung Wireless Audio speaker (Samsung WAM).
 
     Arguments:
@@ -83,10 +82,12 @@ class Speaker():
         self.client = WamClient(self)
 
     async def __aenter__(self):
+        """ Enter async context manager. """
         await self.connect()
         return self
 
     async def __aexit__(self, exc_type, exc_value, exc_tb) -> None:
+        """ Exit async context manager. """
         await self.disconnect()
 
     @property
@@ -362,7 +363,7 @@ class Speaker():
         """ Set volume level.
 
         Arguments:
-            mute:
+            volume:
                 Volume level (0-100).
 
         Returns:
@@ -571,7 +572,7 @@ class Speaker():
     # Group
     # *********************************************************************************************
 
-    async def group(self,
+    async def group(self,  # noqa: C901
                     slaves_before: list[Speaker],
                     slaves_after: list[Speaker],
                     group_name: str | None = None
@@ -591,6 +592,8 @@ class Speaker():
             slaves_after:
                 List of all the slaves in the group, or empty list if
                 the group should be deleted.
+            group_name (optional):
+                Name of group. If None, a default name will be generated.
         """
         # Check that we have needed attributes to call grouping API
         if (

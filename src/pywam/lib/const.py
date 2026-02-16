@@ -9,7 +9,7 @@ speaker.
 """
 
 
-class Feature():
+class Feature:
     """ Supported features. """
     NEXT = 'cmd_next'
     PAUSE = 'cmd_pause'

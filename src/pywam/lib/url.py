@@ -9,7 +9,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
-
 # https://www.iana.org/assignments/media-types/media-types.xhtml
 SUPPORTED_MIME_TYPES = (
     'audio/aac',

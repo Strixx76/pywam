@@ -6,8 +6,8 @@
 from __future__ import annotations
 
 import ipaddress
-from typing import TYPE_CHECKING
 import uuid
+from typing import TYPE_CHECKING
 
 from pywam.lib.equalizer import EqualizerPreset, EqualizerValues
 from pywam.lib.media_presets import MediaPreset
@@ -26,6 +26,7 @@ def speakers(speakers: list[Speaker]) -> list[Speaker]:
     Arguments:
         speakers:
             List of Speaker objects to validate.
+
     Returns:
         Validated value.
 
@@ -38,7 +39,7 @@ def speakers(speakers: list[Speaker]) -> list[Speaker]:
     if not isinstance(speakers, list):
         raise TypeError('Speaker must be a list of Speaker object')
 
-    from pywam.speaker import Speaker  # To avoid circular imports
+    from pywam.speaker import Speaker  # To avoid circular imports  # noqa: PLC0415
     for speaker in speakers:
         if not isinstance(speaker, Speaker):
             raise TypeError('Speaker must be a Speaker object')
@@ -270,10 +271,8 @@ def source(source: str, source_list: list[str]) -> str:
     Arguments:
         source:
             Source to validate
-        model:
-            Speaker model as WAM string
-        master:
-            Set to True if speaker is master in a group
+        source_list:
+            List of sources supported by the speaker.
 
     Returns:
         Validated source.

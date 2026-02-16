@@ -279,7 +279,7 @@ class WamDevice:
         return self._device_info.master_sources
 
     def update_model(self, model: str | None) -> None:
-        """ Update the device model """
+        """ Update the device model. """
         self._device_info = get_device_info(model)
 
     def encode_volume(self, volume: int) -> int:

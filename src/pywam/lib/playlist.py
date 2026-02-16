@@ -5,13 +5,13 @@
 """ Classes and function for handling playing url. """
 
 from __future__ import annotations
-from dataclasses import dataclass
+
 import logging
 import re
+from dataclasses import dataclass
 from urllib.parse import urlsplit
 
 from pywam.lib.url import UrlMediaItem
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ def _find_playlist_format(playlist: str) -> str:
     return UNKNOWN
 
 
-def pls_parser(pls: str) -> list[PlaylistRow]:
+def pls_parser(pls: str) -> list[PlaylistRow]:  # noqa: C901
     """ Parse PLS-playlist.
 
     Supports PLS playlists.

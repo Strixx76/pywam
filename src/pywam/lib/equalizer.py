@@ -10,6 +10,7 @@ class EqualizerPreset:
     """ Stored equalizer presets on the speaker. """
 
     def __init__(self, presetindex: str, presetname: str, **kwargs) -> None:
+        """ Create an EqualizerPreset object. """
         self._presetindex = presetindex
         self._presetname = presetname
 
@@ -52,6 +53,7 @@ class EqualizerValues:
                  hz_2500: str,
                  hz_5000: str,
                  hz_10000: str) -> None:
+        """ Create an EqualizerValues object. """
         self._hz_150 = hz_150
         self._hz_300 = hz_300
         self._hz_600 = hz_600

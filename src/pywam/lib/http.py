@@ -5,12 +5,8 @@
 """ Module for http handling. """
 
 import re
-from typing import (
-    Iterator,
-    Optional,
-    Pattern,
-)
-
+from collections.abc import Iterator
+from re import Pattern
 
 STATUS_LINE: Pattern = re.compile(rb'(HTTP/1.1 )(\d{3})([ ]?\w*)', re.MULTILINE)
 CONTENT_LENGTH: Pattern = re.compile(rb'^Content-Length: (\d+)', re.MULTILINE)
@@ -31,7 +27,7 @@ class HttpResponse:
     __slots__ = ('status', 'body', 'remainder')
 
     def __init__(self,
-                 status: Optional[int] = None,
+                 status: int | None = None,
                  body: str = '',
                  remainder: bytes = b'',
                  ) -> None:
@@ -41,7 +37,7 @@ class HttpResponse:
         self.remainder = remainder
 
 
-def parse_stream(data: bytes) -> Iterator[HttpResponse]:
+def parse_stream(data: bytes) -> Iterator[HttpResponse]:  # noqa: C901
     """ Parse Samsung WAM http responses from a socket stream.
 
     We can't do normal parsing since there is no EOF or even linebreaks

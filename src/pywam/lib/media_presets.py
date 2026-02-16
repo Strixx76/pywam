@@ -18,6 +18,7 @@ class MediaPreset:
                  contentid: str,
                  mediaid: str,
                  **kwargs) -> None:
+        """ Create a MediaPreset object. """
         self._cpname = cpname
         self._kind = kind
         self._title = title
@@ -28,7 +29,7 @@ class MediaPreset:
 
     @property
     def app(self) -> str:
-        """ Return app name. Only 'TuneIn' seems to be supported? """
+        """ Return app name. Only 'TuneIn' seems to be supported. """
         return self._cpname
 
     @property

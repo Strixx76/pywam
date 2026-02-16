@@ -17,13 +17,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import TYPE_CHECKING, Any, Callable, Set
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from pywam.lib.api_response import ApiResponse, api_decode, api_error
 from pywam.lib.exceptions import ApiCallTimeoutError
 from pywam.lib.http import build_http_header, parse_stream
 from pywam.lib.validate import is_integer
-
 
 if TYPE_CHECKING:
     from pywam.lib.api_call import ApiCall
@@ -46,6 +46,7 @@ class WamClient:
     """
 
     def __init__(self, speaker: Speaker) -> None:
+        """ Create a WamClient object. """
         self._ip = speaker.ip
         self._port = speaker.port
         self._user = speaker.user
@@ -59,7 +60,7 @@ class WamClient:
         self._listening: asyncio.Event = asyncio.Event()
         self._listener_task: asyncio.Task | None = None
         # Event and response handling
-        self._subscribers: Set[Callable] = set()
+        self._subscribers: set[Callable] = set()
         self._response_queue: asyncio.Queue[ApiResponse] | None = None
         # API requests
         self._http_request: str = build_http_header(self._ip, self._port, self._user)
@@ -274,8 +275,8 @@ class WamClient:
 
         await self._receive_loop_error()
 
-    async def _response_handler(self, http_response: 'HttpResponse') -> None:
-        """ Handles incoming HTTP responses.
+    async def _response_handler(self, http_response: HttpResponse) -> None:
+        """ Handle incoming HTTP responses.
 
         Incoming http responses (XML) get parsed to ApiResponse objects.
         The ApiResponse object is then dispatched to any subscriber,
@@ -294,7 +295,7 @@ class WamClient:
         self._dispatch_event(api_response)
         await self._return_response(api_response)
 
-    async def _return_response(self, api_response: 'ApiResponse') -> None:
+    async def _return_response(self, api_response: ApiResponse) -> None:
         """ Return the ApiResponse.
 
         If the request method is awaiting a response the ApiResponse
@@ -308,8 +309,8 @@ class WamClient:
         if self._response_queue:
             await self._response_queue.put(api_response)
 
-    async def _wait_for_response(self, api_call: 'ApiCall') -> 'ApiResponse':
-        """ Waits for the correct response from speaker.
+    async def _wait_for_response(self, api_call: ApiCall) -> ApiResponse:
+        """ Wait for the correct response from speaker.
 
         Argument:
             api_call:
@@ -337,7 +338,7 @@ class WamClient:
     # Observation methods
     # ******************************************************************
 
-    def _dispatch_event(self, api_response: 'ApiResponse') -> None:
+    def _dispatch_event(self, api_response: ApiResponse) -> None:
         """ Send events to subscriber.
 
         Arguments:
@@ -350,7 +351,7 @@ class WamClient:
             except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception('(%s) Error when trying to dispatch an event', self._ip)
 
-    def register_subscriber(self, callback: Callable[['ApiResponse'], Any]) -> None:
+    def register_subscriber(self, callback: Callable[[ApiResponse], Any]) -> None:
         """ Register a function for receiving events from speaker.
 
         Arguments:

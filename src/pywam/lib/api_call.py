@@ -58,6 +58,7 @@ class ApiCall:
         self.timeout_multiple = timeout_multiple
 
     def __str__(self):
+        """ Return string representation of ApiCall. """
         return ('ApiCall:\n' +
                 f'api_type: {self.api_type}\n' +
                 f'method: {self.method}\n' +
@@ -298,7 +299,7 @@ def set_uic_repeat_mode(repeat_mode: str) -> ApiCall:
     """ (UIC) Set playback repeat mode.
 
     Arguments:
-        mode:
+        repeat_mode:
             Repeat mode. ('one' | 'all' | 'off')
     """
     return ApiCall(api_type='UIC',
@@ -337,7 +338,7 @@ def set_func(func: str) -> ApiCall:
     """ (UIC) Set the source for the speaker.
 
     Arguments:
-        source:
+        func:
             Source to select.
             ('aux' | 'bt' | 'hdmi' | 'optical' | 'soundshare' | 'wifi')
     """
@@ -551,9 +552,9 @@ def get_preset_list(start_index: int, list_count: int) -> ApiCall:
     Will return an error (- errcode: 73) if not radio is selected.
 
     Arguments:
-        startindex:
+        start_index:
             Starting position to retrieve
-        listcount:
+        list_count:
             Total number of items to retrieve
     """
     return ApiCall(api_type='CPM',
@@ -720,7 +721,7 @@ def set_multispk_group_subspk(name: str,
 
 
 def set_ungroup() -> ApiCall:
-    """ (UIC) Ungroup speakers """
+    """ (UIC) Ungroup speakers. """
     return ApiCall(api_type='UIC',
                    pwron=False,
                    method='SetUngroup',

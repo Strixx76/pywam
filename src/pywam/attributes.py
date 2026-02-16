@@ -13,9 +13,9 @@ from pywam.lib.const import SOURCES_BY_API
 from pywam.lib.equalizer import EqualizerPreset, EqualizerValues
 from pywam.lib.media_presets import MediaPreset
 
-
 if TYPE_CHECKING:
     from datetime import datetime
+
     from pywam.speaker import Speaker
 
 
@@ -140,6 +140,7 @@ class WamAttributes:
     """
 
     def __init__(self, speaker: Speaker, device: WamDevice) -> None:
+        """ Create a WamAttributes object. """
 
         self._speaker = speaker
         self._device = device
@@ -200,10 +201,11 @@ class WamAttributes:
         self._last_seen: datetime | None = None
 
     def __str__(self):
+        """ Return string representation of speaker attributes. """
         return str(self.get_state_copy())
 
     def _get_int_state_copy(self) -> dict:
-        """ Returns a copy of all WAM state attributes.
+        """ Return a copy of all WAM state attributes.
 
         Only to be used for debugging purpose.
         """
@@ -548,7 +550,7 @@ class WamAttributes:
         return self._last_seen
 
     def get_state_copy(self) -> dict:
-        """ Returns a copy of all attributes as dictionary. """
+        """ Return a copy of all attributes as dictionary. """
         return {
             'name': self.name,
             'mac': self.mac,

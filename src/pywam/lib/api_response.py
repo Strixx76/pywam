@@ -4,9 +4,9 @@
 
 """ Api response handling. """
 
+import xml.etree.ElementTree as ET
 from collections import defaultdict
 from typing import Any
-import xml.etree.ElementTree as ET
 
 
 class ApiResponse:
@@ -56,6 +56,7 @@ class ApiResponse:
                  err_msg: str = '',
                  err_repr: str = '',
                  ) -> None:
+        """ Create a ApiResponse object. """
         self.raw_response = raw_response
         self.api_type = api_type
         self.method = method
@@ -68,6 +69,7 @@ class ApiResponse:
         self.err_repr = err_repr
 
     def __str__(self) -> str:
+        """ Return a string representation of the ApiResponse object."""
         return ('ApiResponse:\n' +
                 f' raw_response: {self.raw_response}\n' +
                 f' api_type: {self.api_type}\n' +
@@ -159,7 +161,7 @@ def api_decode(raw_response: str) -> ApiResponse:
                 resp[node.tag] = text
         return resp
 
-    root = ET.fromstring(raw_response)
+    root = ET.fromstring(raw_response)  # noqa: S314
     root_dict = xml_to_dict(root)
     response_dict = root_dict[root.tag]
     response_dict['type'] = root.tag
