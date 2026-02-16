@@ -2,7 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [0.2.0] - 2026-02-18
+- From now on the version should match the version of (samsungwam)[https://github.com/Strixx76/samsungwam]
+- Updated dev environment
+- Fixed some typos and docstrings
 
 ## [0.1.0rc6] - 2025-01-18
 

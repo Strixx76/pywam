@@ -10,8 +10,11 @@
 
 pywam is an fast and lightweight python asyncio library without external dependencies for communicating with Samsung Wireless Audio (R) speakers (WAM). It was developed to be used for integrating the speakers in [Home Assistant](https://www.home-assistant.io/) with the [Samsung Wireless Audio Integration](https://github.com/Strixx76/samsungwam)
 
-> [!NOTE]
-> Latest version is 0.1.0rc6 and will stay versioned as release candidate. This is because of small mistake with dependencies in the first release of the Samsung Wireless Audio. So next none beta or rc release of this library will be either 0.2 or 1.0, there will be no 0.1 release.
+> [!IMPORTANT]
+> This library only supports speakers that can be controlled by the [Wireless Audio-Multiroom (Android)](https://play.google.com/store/apps/details?id=com.samsung.roomspeaker3&pcampaignid=web_share) or [Wireless Audio : Multiroom (iOS)](https://apps.apple.com/se/app/wireless-audio-multiroom/id1081757852).
+> This library will never support speakers not supported by the native Multiroom App.
+> Check src/pywam/device.py to see which speakers are tested and which are believed to work.
+
 
 ## Features
 

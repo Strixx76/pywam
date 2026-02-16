@@ -172,6 +172,7 @@ cython_debug/
 
 # VS Code
 .vscode/
+.devcontainer.json
 
 # Local History for Visual Studio Code
 .history/
