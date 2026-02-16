@@ -1,0 +1,37 @@
+{
+    "name": "Strixx76/pywam",
+    "image": "mcr.microsoft.com/devcontainers/python:3.13",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.mypy-type-checker",
+                "charliermarsh.ruff",
+                "njpwerner.autodocstring",
+                "streetsidesoftware.code-spell-checker",
+                "eamodio.gitlens",
+                "github.vscode-pull-request-github",
+                "oderwat.indent-rainbow",
+                "codeium.codeium"
+            ],
+            "settings": {
+                "files.eol": "\n",
+                "editor.tabSize": 4,
+                "editor.formatOnPaste": true,
+                "editor.formatOnSave": true,
+                "editor.formatOnType": false,
+                "files.trimTrailingWhitespace": true,
+                "python.analysis.typeCheckingMode": "basic",
+                "python.analysis.autoImportCompletions": true,
+                "python.pythonPath": "/usr/local/bin/python",
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff"
+                },
+                "autoDocstring.customTemplatePath": ".vscode/autodocstring.mustache"
+            }
+        }
+    },
+    "remoteUser": "vscode"
+}
