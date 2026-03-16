@@ -1,6 +1,7 @@
 {
     "name": "Strixx76/pywam",
     "image": "mcr.microsoft.com/devcontainers/python:3.13",
+    "postCreateCommand": "pip install --upgrade pip; pip install build twine",
     "customizations": {
         "vscode": {
             "extensions": [
@@ -18,8 +19,8 @@
             "settings": {
                 "files.eol": "\n",
                 "editor.tabSize": 4,
-                "editor.formatOnPaste": true,
-                "editor.formatOnSave": true,
+                "editor.formatOnPaste": false,
+                "editor.formatOnSave": false,
                 "editor.formatOnType": false,
                 "files.trimTrailingWhitespace": true,
                 "python.analysis.typeCheckingMode": "basic",
