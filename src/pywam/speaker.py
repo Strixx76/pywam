@@ -438,6 +438,8 @@ class Speaker:
         await self.client.request(api_call.get_ap_info())
         # Connected clients
         # TODO: Get 'IpInfo' - Don't know the API-call to make.
+        # Max API volume for some speakers.
+        await self.client.request(api_call.get_feature())
 
     async def update_player_info(self) -> None:
         """ Update player attributes. """

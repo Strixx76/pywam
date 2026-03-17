@@ -192,6 +192,26 @@ def get_ap_info() -> ApiCall:
                    )
 
 
+def get_feature() -> ApiCall:
+    """ (UIC) Get feature information.
+
+    Important:
+        This API call is not supported by all speakers. But the ones
+        that support it will return eg volume steps.
+
+        expected_response is 'Feature' but we don't want to wait for
+        a response since not all speakers support this API call.
+    """
+    return ApiCall(api_type='UIC',
+                   pwron=False,
+                   method='GetFeature',
+                   args=[],
+                   expected_response='',
+                   user_check=False,
+                   timeout_multiple=1,
+                   )
+
+
 # **********************************************************************
 # Player and media
 # **********************************************************************

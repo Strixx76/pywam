@@ -68,8 +68,10 @@ class WamAttributes:
         _groupname:
             Name of speaker group or 'None'. If received by MultispkGroup-event
             slaves will not know the groupname and GetGroupName-call must be sent.
+        _stepofvolume:
+            Max volume for API calls. If None default to device info.
         _volume:
-            Speaker volume between 0 and 30.
+            Speaker volume between 0 and _stepofvolumes.
         _mute:
             Mute state - 'on'|'off' - 'on' = muted.
         _playstatus:
@@ -165,6 +167,7 @@ class WamAttributes:
         self._groupmainmacaddr: str | None = None
         self._groupspknum: str | None = None
         # Player attributes
+        self._stepofvolume: str | None = None
         self._volume: str | None = None
         self._mute: str | None = None
         self._playstatus: str | None = None
@@ -228,6 +231,7 @@ class WamAttributes:
             '_groupmainmacaddr': self._groupmainmacaddr,
             '_groupspknum': self._groupspknum,
 
+            '_stepofvolume': self._stepofvolume,
             '_volume': self._volume,
             '_mute': self._mute,
             '_playstatus': self._playstatus,
@@ -391,7 +395,7 @@ class WamAttributes:
     def volume(self) -> int | None:
         """ Return volume level (0-100). """
         if self._volume is not None:
-            return self._device.decode_volume(int(self._volume))
+            return self._device.decode_volume(int(self._volume), self._stepofvolume)
         return None
 
     @property

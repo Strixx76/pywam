@@ -11,7 +11,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-
 SPEAKER_MODELS: dict[str, dict[str, Any]] = {
     # Confirmed working
     'SPK-WAM350': {'name': 'Shape M3',
@@ -282,14 +281,16 @@ class WamDevice:
         """ Update the device model. """
         self._device_info = get_device_info(model)
 
-    def encode_volume(self, volume: int) -> int:
+    def encode_volume(self, volume: int, max_volume: str | None = None  ) -> int:
         """ Translate volume to API values. """
-        factor = self._device_info.max_api_volume / 100
+        max_api = self._device_info.max_api_volume if max_volume is None else int(max_volume)
+        factor = max_api / 100
         vol = int(volume * factor)
         return min(max(vol, 0), self._device_info.max_api_volume)
 
-    def decode_volume(self, volume: int) -> int:
+    def decode_volume(self, volume: int, max_volume: str | None = None  ) -> int:
         """ Translate volume to user value. """
-        factor = 100 / self._device_info.max_api_volume
+        max_api = self._device_info.max_api_volume if max_volume is None else int(max_volume)
+        factor = 100 / max_api
         vol = int(volume * factor)
         return min(max(vol, 0), 100)

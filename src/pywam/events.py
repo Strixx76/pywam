@@ -971,6 +971,61 @@ class WamEvents:
         """
         return False
 
+    def event_Feature(self, event: ApiResponse) -> bool:
+        """ Response to GetFeature.
+
+        NB! This response is not investigated fully yet, but it can
+        contains the steps of volume for some speakers.
+
+        method (str): 'Feature'
+        type: (str): 'UIC'
+        version (str): '1.0'
+        speakerip (str): Speakers IP-address.
+        user_identifier (str): 'public'
+
+        response (dict):
+            @result(str):
+                'ok' | 'ng'
+            musiccontentsprovider(str):
+                Only seen '1'.
+            wifidlna(str):
+                Only seen '1'.
+            dmr(str):
+                Only seen '1'.
+            miracast(str):
+                Only seen '1'.
+            bt(str):
+                Only seen '1'.
+            aux(str):
+                Only seen '1'.
+            din(str):
+                Only seen '1'.
+            usb(str):
+                Only seen '0'.
+            arc(str):
+                Only seen '1'.
+            multiroomms(str):
+                Only seen '1'.
+            multiroommc(str):
+                Only seen '1'.
+            numofhdmi(str):
+                Only seen '1' and '2'.
+            numofchannel(str):
+                Only seen '3'.
+            stepofvolume(str):
+                Max volume for API calls.
+            audioprompt(str):
+                Only seen '0'.
+            btremotecontroller(str):
+                Only seen '0'.
+            installationtype(str):
+                Only seen '0'.
+            wooferoption(str):
+                Only seen '2'.
+        """
+        self._attr._stepofvolume = event.get_key('stepofvolume')
+        return True
+
     def event_GlobalSearch(self, event: ApiResponse) -> bool:
         """ ????.
 
