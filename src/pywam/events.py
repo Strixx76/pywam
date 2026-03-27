@@ -6,7 +6,7 @@
 # pylint: disable=W0613:unused-argument
 # pylint: disable=C0103:invalid-name
 # pylint: disable=C0302:too-many-lines
-""" Checking for state/attribute changes. """
+"""Checking for state/attribute changes."""
 from __future__ import annotations
 
 import logging
@@ -25,7 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class WamEvents:
-    """ Handles events from speaker.
+    """Handles events from speaker.
 
     Arguments:
         attributes:
@@ -33,21 +33,21 @@ class WamEvents:
     """
 
     def __init__(self, speaker: Speaker):
-        """ Create a WamEvents object. """
+        """Create a WamEvents object."""
         self._attr = speaker.attribute
         self._speaker = speaker
         self._subscriber: dict[Callable, int] = {}
         self._latest_known_state: dict = self._attr.get_state_copy()
 
     def receiver(self, event: ApiResponse) -> None:
-        """ Receives events from WamClient.
+        """Receives events from WamClient.
 
         Arguments:
             event:
                 ApiResponse object with information about the event.
         """
-        _LOGGER.debug('(%s) Event handler received an event', self._speaker.ip)
-        _LOGGER.debug('Event: %s', event)
+        _LOGGER.debug("(%s) Event handler received an event", self._speaker.ip)
+        _LOGGER.debug("Event: %s", event)
 
         # Don't do anything with unsuccessful responses. Empty events
         # can mess upp stored state of speaker.
@@ -55,10 +55,12 @@ class WamEvents:
             return
 
         # Call corresponding method for events from speaker.
-        event_method = getattr(self, 'event_' + event.method, None)
+        event_method = getattr(self, "event_" + event.method, None)
         if not event_method:
-            _LOGGER.info('(%s) Event handler received an unknown event', self._speaker.ip)
-            _LOGGER.info('Event: %s', event)
+            _LOGGER.info(
+                "(%s) Event handler received an unknown event", self._speaker.ip
+            )
+            _LOGGER.info("Event: %s", event)
             return
         used = event_method(event)
 
@@ -72,7 +74,7 @@ class WamEvents:
     # ******************************************************************
 
     def _dispatch_event(self, used: bool, event: ApiResponse) -> None:
-        """ Send events to subscriber. """
+        """Send events to subscriber."""
         for subscriber, info_level in self._subscriber.items():
             try:
                 if info_level == 2:
@@ -90,13 +92,16 @@ class WamEvents:
                         subscriber()
                     self._latest_known_state = new
             except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception('(%s) Could not dispatch event from speaker', self._speaker.ip)
+                _LOGGER.exception(
+                    "(%s) Could not dispatch event from speaker", self._speaker.ip
+                )
 
-    def register_subscriber(self,
-                            callback: Callable[[], Any] | Callable[[dict], Any],
-                            info_level: int = 0,
-                            ) -> None:
-        """ Register subscriber for speaker attribute changes.
+    def register_subscriber(
+        self,
+        callback: Callable[[], Any] | Callable[[dict], Any],
+        info_level: int = 0,
+    ) -> None:
+        """Register subscriber for speaker attribute changes.
 
         Arguments:
             callback:
@@ -116,12 +121,12 @@ class WamEvents:
             TypeError: If given argument is not a callable.
         """
         if not callable(callback):
-            raise TypeError(f'({self._speaker.ip}) Subscriber must be a callable')
+            raise TypeError(f"({self._speaker.ip}) Subscriber must be a callable")
         info_level = is_integer(info_level, (0, 2))
         self._subscriber[callback] = info_level
 
     def unregister_subscriber(self, callback: Callable) -> None:
-        """ Unregister subscriber.
+        """Unregister subscriber.
 
         Arguments:
             callback:
@@ -134,8 +139,8 @@ class WamEvents:
             del self._subscriber[callback]
         except KeyError as e:
             raise KeyError(
-                    f'({self._speaker.ip}) {callback} is not a registered subscriber'
-                ) from e
+                f"({self._speaker.ip}) {callback} is not a registered subscriber"
+            ) from e
 
     # ******************************************************************
     # Speaker events
@@ -146,7 +151,7 @@ class WamEvents:
     # SubMenu, ErrorEvent, RadioPlayList
 
     def event_7BandEQList(self, event: ApiResponse) -> bool:
-        """ List of all equalizer presets on the speaker.
+        """List of all equalizer presets on the speaker.
 
         method (str): '7BandEQList'
         type: (str): 'UIC'
@@ -170,11 +175,13 @@ class WamEvents:
             presetlistcount(str):
                 ???? (Always "4"?)
         """
-        self._attr._eqmode_presetlist = listify(event.get_subkey('presetlist', 'preset'))
+        self._attr._eqmode_presetlist = listify(
+            event.get_subkey("presetlist", "preset")
+        )
         return True
 
     def event_7bandEQMode(self, event: ApiResponse) -> bool:
-        """ Set current EQ settings for speaker.
+        """Set current EQ settings for speaker.
 
         Same attributes as 'CurrentEQMode'. Don't know when which is
         sent.
@@ -207,18 +214,18 @@ class WamEvents:
             presetname(str):
                 Name of EQ-preset.
         """
-        self._attr._presetname = event.get_key('presetname')
-        self._attr._eqvalue1 = event.get_key('eqvalue1')
-        self._attr._eqvalue2 = event.get_key('eqvalue2')
-        self._attr._eqvalue3 = event.get_key('eqvalue3')
-        self._attr._eqvalue4 = event.get_key('eqvalue4')
-        self._attr._eqvalue5 = event.get_key('eqvalue5')
-        self._attr._eqvalue6 = event.get_key('eqvalue6')
-        self._attr._eqvalue7 = event.get_key('eqvalue7')
+        self._attr._presetname = event.get_key("presetname")
+        self._attr._eqvalue1 = event.get_key("eqvalue1")
+        self._attr._eqvalue2 = event.get_key("eqvalue2")
+        self._attr._eqvalue3 = event.get_key("eqvalue3")
+        self._attr._eqvalue4 = event.get_key("eqvalue4")
+        self._attr._eqvalue5 = event.get_key("eqvalue5")
+        self._attr._eqvalue6 = event.get_key("eqvalue6")
+        self._attr._eqvalue7 = event.get_key("eqvalue7")
         return True
 
     def event_7bandEQValue(self, event: ApiResponse) -> bool:
-        """ Set current EQ settings for speaker.
+        """Set current EQ settings for speaker.
 
         This one is sent when current setting is not an preset.
 
@@ -249,17 +256,17 @@ class WamEvents:
                 Always '0'?
         """
         self._attr._presetname = None
-        self._attr._eqvalue1 = event.get_key('eqvalue1')
-        self._attr._eqvalue2 = event.get_key('eqvalue2')
-        self._attr._eqvalue3 = event.get_key('eqvalue3')
-        self._attr._eqvalue4 = event.get_key('eqvalue4')
-        self._attr._eqvalue5 = event.get_key('eqvalue5')
-        self._attr._eqvalue6 = event.get_key('eqvalue6')
-        self._attr._eqvalue7 = event.get_key('eqvalue7')
+        self._attr._eqvalue1 = event.get_key("eqvalue1")
+        self._attr._eqvalue2 = event.get_key("eqvalue2")
+        self._attr._eqvalue3 = event.get_key("eqvalue3")
+        self._attr._eqvalue4 = event.get_key("eqvalue4")
+        self._attr._eqvalue5 = event.get_key("eqvalue5")
+        self._attr._eqvalue6 = event.get_key("eqvalue6")
+        self._attr._eqvalue7 = event.get_key("eqvalue7")
         return True
 
     def event_AcmMode(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AcmMode'
         type: (str): 'UIC'
@@ -277,7 +284,7 @@ class WamEvents:
         return False
 
     def event_AddCustomEQMode(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AddCustomEQMode'
         type: (str): 'UIC'
@@ -293,7 +300,7 @@ class WamEvents:
         return False
 
     def event_AddSongsToMultiQueueResult(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AddSongsToMultiQueueResult'
         type: (str): 'UIC'
@@ -312,7 +319,7 @@ class WamEvents:
         return False
 
     def event_AlarmInfo(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AlarmInfo'
         type: (str): 'UIC'
@@ -339,7 +346,7 @@ class WamEvents:
         return False
 
     def event_AlarmOnOff(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AlarmOnOff'
         type: (str): 'UIC'
@@ -355,7 +362,7 @@ class WamEvents:
         return False
 
     def event_AlarmSoundList(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AlarmSoundList'
         type: (str): 'UIC'
@@ -375,7 +382,7 @@ class WamEvents:
         return False
 
     def event_AllAlarmInfo(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AllAlarmInfo'
         type: (str): 'UIC'
@@ -420,7 +427,7 @@ class WamEvents:
         return False
 
     def event_ApInfo(self, event: ApiResponse) -> bool:
-        """ Information about network connection.
+        """Information about network connection.
 
         method (str): 'ApInfo'
         type: (str): 'UIC'
@@ -448,14 +455,14 @@ class WamEvents:
             wifidirectssid(str):
                 ????
         """
-        self._attr._ch = event.get_key('ch')
-        self._attr._connectiontype = event.get_key('connectiontype')
-        self._attr._rssi = event.get_key('rssi')
-        self._attr._ssid = event.get_key('ssid')
+        self._attr._ch = event.get_key("ch")
+        self._attr._connectiontype = event.get_key("connectiontype")
+        self._attr._rssi = event.get_key("rssi")
+        self._attr._ssid = event.get_key("ssid")
         return False
 
     def event_AudioUI(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AudioUI'
         type: (str): 'UIC'
@@ -470,7 +477,7 @@ class WamEvents:
         return False
 
     def event_AutoUpdate(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AutoUpdate'
         type: (str): 'UIC'
@@ -485,7 +492,7 @@ class WamEvents:
         return False
 
     def event_AvSourceAll(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'AvSourceAll'
         type: (str): 'UIC'
@@ -501,7 +508,7 @@ class WamEvents:
         return False
 
     def event_AvSourceAddedEvent(self, event: ApiResponse) -> bool:
-        """ Found new AV-source on the network.
+        """Found new AV-source on the network.
 
         method (str): 'AvSourceAddedEvent'
         type: (str): 'UIC'
@@ -527,7 +534,7 @@ class WamEvents:
         return False
 
     def event_AvSourceDeletedEvent(self, event: ApiResponse) -> bool:
-        """ AV-source disappeared from on the network.
+        """AV-source disappeared from on the network.
 
         method (str): 'AvSourceDeletedEvent'
         type: (str): 'UIC'
@@ -551,7 +558,7 @@ class WamEvents:
         return False
 
     def event_BatteryStatus(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'BatteryStatus'
         type: (str): 'UIC'
@@ -567,7 +574,7 @@ class WamEvents:
         return False
 
     def event_ChVolMultich(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'ChVolMultich'
         type: (str): 'UIC'
@@ -582,7 +589,7 @@ class WamEvents:
         return False
 
     def event_ConnectionStatus(self, event: ApiResponse) -> bool:
-        """ Device connected to speaker.
+        """Device connected to speaker.
 
         Sent when a Bluetooth device connects to or disconnects from
         the speaker.
@@ -605,13 +612,13 @@ class WamEvents:
         """
         self._attr.reset_source_info()
         self._attr.reset_media_info()
-        self._attr._devicename = event.get_key('devicename')
-        self._attr._connection = event.get_key('connection')
-        self._attr._function = event.get_key('function')
+        self._attr._devicename = event.get_key("devicename")
+        self._attr._connection = event.get_key("connection")
+        self._attr._function = event.get_key("function")
         return True
 
     def event_CpChanged(self, event: ApiResponse) -> bool:
-        """ Another cp service was selected.
+        """Another cp service was selected.
 
         Sent when a new cp is selected for browsing or searching.
 
@@ -628,7 +635,7 @@ class WamEvents:
         return False
 
     def event_CpInfo(self, event: ApiResponse) -> bool:
-        """ Set currently selected cp service.
+        """Set currently selected cp service.
 
         The cpm app selected for doing operations, and not what is
         playing on the speaker. You could have 'Spotify' selected and at
@@ -670,7 +677,7 @@ class WamEvents:
         return False
 
     def event_CpList(self, event: ApiResponse) -> bool:
-        """ List all available music service providers.
+        """List all available music service providers.
 
         method (str): 'CpList'
         type: (str): 'CPM'
@@ -694,7 +701,7 @@ class WamEvents:
         return False
 
     def event_CurrentEQMode(self, event: ApiResponse) -> bool:
-        """ Set current EQ settings for speaker.
+        """Set current EQ settings for speaker.
 
         Same as attributes as '7bandEQMode'. Don't know when which is
         sent.
@@ -727,18 +734,18 @@ class WamEvents:
             presetname(str):
                 Name of EQ-preset.
         """
-        self._attr._presetname = event.get_key('presetname')
-        self._attr._eqvalue1 = event.get_key('eqvalue1')
-        self._attr._eqvalue2 = event.get_key('eqvalue2')
-        self._attr._eqvalue3 = event.get_key('eqvalue3')
-        self._attr._eqvalue4 = event.get_key('eqvalue4')
-        self._attr._eqvalue5 = event.get_key('eqvalue5')
-        self._attr._eqvalue6 = event.get_key('eqvalue6')
-        self._attr._eqvalue7 = event.get_key('eqvalue7')
+        self._attr._presetname = event.get_key("presetname")
+        self._attr._eqvalue1 = event.get_key("eqvalue1")
+        self._attr._eqvalue2 = event.get_key("eqvalue2")
+        self._attr._eqvalue3 = event.get_key("eqvalue3")
+        self._attr._eqvalue4 = event.get_key("eqvalue4")
+        self._attr._eqvalue5 = event.get_key("eqvalue5")
+        self._attr._eqvalue6 = event.get_key("eqvalue6")
+        self._attr._eqvalue7 = event.get_key("eqvalue7")
         return True
 
     def event_CurrentFunc(self, event: ApiResponse) -> bool:
-        """ Set urrent selected source for the speaker.
+        """Set urrent selected source for the speaker.
 
         Sent when asked for (´GetFunc´) or when changed (´SetFunc´).
 
@@ -765,20 +772,20 @@ class WamEvents:
         # Workaround for UrlPlayback
         # If the native app is started we need to ignore the attributes
         # if we are playing a url.
-        if event.get_key('submode') == 'cp' and self._attr._submode == 'url':
+        if event.get_key("submode") == "cp" and self._attr._submode == "url":
             return False
 
-        function = event.get_key('function')
+        function = event.get_key("function")
         if function != self._attr._function:
             self._attr.reset_media_info()
             self._attr._function = function
-        self._attr._submode = event.get_key('submode')
-        self._attr._connection = event.get_key('connection')
-        self._attr._devicename = event.get_key('devicename')
+        self._attr._submode = event.get_key("submode")
+        self._attr._connection = event.get_key("connection")
+        self._attr._devicename = event.get_key("devicename")
         return True
 
     def event_DelAlarm(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'DelAlarm'
         type: (str): 'UIC'
@@ -795,7 +802,7 @@ class WamEvents:
         return False
 
     def event_DelCustomEQMode(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'DelCustomEQMode'
         type: (str): 'UIC'
@@ -811,7 +818,7 @@ class WamEvents:
         return False
 
     def event_DelSongsFromMultiQueueResult(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'DelSongsFromMultiQueueResult'
         type: (str): 'UIC'
@@ -830,7 +837,7 @@ class WamEvents:
         return False
 
     def event_DeviceId(self, event: ApiResponse) -> bool:
-        """ Device ID.
+        """Device ID.
 
         Speaker has three different ID.
          - Received from upnp/ssdp (13 char)
@@ -850,11 +857,11 @@ class WamEvents:
             device_id(str):
                 Device ID
         """
-        self._attr._device_id = event.get_key('device_id')
+        self._attr._device_id = event.get_key("device_id")
         return True
 
     def event_DMSAddedEvent(self, event: ApiResponse) -> bool:
-        """ UIC - New DLNA server discovered.
+        """UIC - New DLNA server discovered.
 
         method (str): 'DMSAddedEvent'
         type: (str): 'UIC'
@@ -868,7 +875,7 @@ class WamEvents:
         return False
 
     def event_DMSDeletedEvent(self, event: ApiResponse) -> bool:
-        """ UIC - DLNA removed from network.
+        """UIC - DLNA removed from network.
 
         method (str): 'DMSDeletedEvent'
         type: (str): 'UIC'
@@ -883,7 +890,7 @@ class WamEvents:
         return False
 
     def event_DmsList(self, event: ApiResponse) -> bool:
-        """ UIC - DLNA servers found by the speaker.
+        """UIC - DLNA servers found by the speaker.
 
         List all dlna music servers found by the speaker.
 
@@ -912,7 +919,7 @@ class WamEvents:
         return False
 
     def event_EndPlaybackEvent(self, event: ApiResponse) -> bool:
-        """ Start playback.
+        """Start playback.
 
         Sent when stopping playback on the speaker.
 
@@ -928,11 +935,11 @@ class WamEvents:
             playtime(str):
                 ?
         """
-        self._attr._playstatus = 'stop'
+        self._attr._playstatus = "stop"
         return True
 
     def event_EQDrc(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'EQDrc'
         type: (str): 'UIC'
@@ -949,7 +956,7 @@ class WamEvents:
         return False
 
     def event_EQMode(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'EQMode'
         type: (str): 'UIC'
@@ -972,7 +979,7 @@ class WamEvents:
         return False
 
     def event_Feature(self, event: ApiResponse) -> bool:
-        """ Response to GetFeature.
+        """Response to GetFeature.
 
         NB! This response is not investigated fully yet, but it can
         contains the steps of volume for some speakers.
@@ -1023,11 +1030,13 @@ class WamEvents:
             wooferoption(str):
                 Only seen '2'.
         """
-        self._attr._stepofvolume = event.get_key('stepofvolume')
+        _LOGGER.debug("Recieved event Feature")
+        self._attr._stepofvolume = event.get_key("stepofvolume")
+        _LOGGER.debug("stepofvolume = %s", self._attr._stepofvolume)
         return True
 
     def event_GlobalSearch(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'GlobalSearch'
         type: (str): 'CPM'
@@ -1040,7 +1049,7 @@ class WamEvents:
         return False
 
     def event_GroupName(self, event: ApiResponse) -> bool:
-        """ Name of speaker group.
+        """Name of speaker group.
 
         method (str): 'GroupName'
         type: (str): 'UIC'
@@ -1054,11 +1063,11 @@ class WamEvents:
             groupname(str):
                 Name of speaker group or 'None'.
         """
-        self._attr._groupname = event.get_key('groupname')
+        self._attr._groupname = event.get_key("groupname")
         return True
 
     def event_IpInfo(self, event: ApiResponse) -> bool:
-        """ List of all connected clients.
+        """List of all connected clients.
 
         method (str): 'IpInfo'
         type: (str): 'UIC'
@@ -1077,11 +1086,11 @@ class WamEvents:
                             Clients IP address
             listcount(str):
         """
-        self._attr._iptable = listify(event.get_subkey('iptablelist', 'iptable'))
+        self._attr._iptable = listify(event.get_subkey("iptablelist", "iptable"))
         return True
 
     def event_KPIValue(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'KPIValue'
         type: (str): 'UIC'
@@ -1096,7 +1105,7 @@ class WamEvents:
         return False
 
     def event_LastMusicEvent(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'LastMusicEvent'
         type: (str): 'UIC'
@@ -1109,7 +1118,7 @@ class WamEvents:
         return False
 
     def event_LedStatus(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'LedStatus'
         type: (str): 'UIC'
@@ -1124,7 +1133,7 @@ class WamEvents:
         return False
 
     def event_LocaleChange(self, event: ApiResponse) -> bool:
-        """ Location changed.
+        """Location changed.
 
         Sent when the location is change. Is used when browse and search
         TuneIn to get local radio stations.
@@ -1142,7 +1151,7 @@ class WamEvents:
         return False
 
     def event_MainInfo(self, event: ApiResponse) -> bool:
-        """ Receive Main information about speaker.
+        """Receive Main information about speaker.
 
         Sent as second response on API call ´GetMainInfo´.
 
@@ -1187,18 +1196,21 @@ class WamEvents:
             spkmodelname(str):
                 Speaker model.
         """
-        self._attr._spkmacaddr = event.get_key('spkmacaddr', self._attr._spkmacaddr)
-        self._attr._spkmodelname = event.get_key('spkmodelname', self._attr._spkmodelname)
-        self._attr._btmacaddr = event.get_key('btmacaddr', self._attr._btmacaddr)
-        self._attr._groupmainip = event.get_key('groupmainip', self._attr._groupmainip)
+        self._attr._spkmacaddr = event.get_key("spkmacaddr", self._attr._spkmacaddr)
+        self._attr._spkmodelname = event.get_key(
+            "spkmodelname", self._attr._spkmodelname
+        )
+        self._attr._btmacaddr = event.get_key("btmacaddr", self._attr._btmacaddr)
+        self._attr._groupmainip = event.get_key("groupmainip", self._attr._groupmainip)
         self._attr._groupmainmacaddr = event.get_key(
-            'groupmainmacaddr', self._attr._groupmainmacaddr)
-        self._attr._groupspknum = event.get_key('groupspknum', self._attr._groupspknum)
-        self._attr._grouptype = event.get_key('grouptype', self._attr._grouptype)
+            "groupmainmacaddr", self._attr._groupmainmacaddr
+        )
+        self._attr._groupspknum = event.get_key("groupspknum", self._attr._groupspknum)
+        self._attr._grouptype = event.get_key("grouptype", self._attr._grouptype)
         return True
 
     def event_MediaBufferEndEvent(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'MediaBufferEndEvent'
         type: (str): 'UIC'
@@ -1213,7 +1225,7 @@ class WamEvents:
         return False
 
     def event_MediaBufferStartEvent(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'MediaBufferStartEvent'
         type: (str): 'UIC'
@@ -1228,7 +1240,7 @@ class WamEvents:
         return False
 
     def event_MultiHopInfo(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'MultiHopInfo'
         type: (str): 'UIC'
@@ -1246,7 +1258,7 @@ class WamEvents:
         return False
 
     def event_MultiQueueList(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'MultiQueueList'
         type: (str): 'UIC'
@@ -1286,7 +1298,7 @@ class WamEvents:
         return False
 
     def event_MultichGroup(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'MultichGroup'
         type: (str): 'UIC'
@@ -1318,7 +1330,7 @@ class WamEvents:
         return False
 
     def event_MultispkGroup(self, event: ApiResponse) -> bool:
-        """ Information about multi speaker groups.
+        """Information about multi speaker groups.
 
         method (str): 'MultispkGroup'
         type: (str): 'UIC'
@@ -1368,16 +1380,16 @@ class WamEvents:
             subspklistcount(str, optional):
                 [Master] Number of subspeakers
         """
-        self._attr._groupmainip = event.get_key('groupmainip')
-        self._attr._groupmainmacaddr = event.get_key('groupmainmacaddr')
+        self._attr._groupmainip = event.get_key("groupmainip")
+        self._attr._groupmainmacaddr = event.get_key("groupmainmacaddr")
         # Attribute spknum is called groupspknum in MainInfo so we use that instead
-        self._attr._groupspknum = event.get_key('spknum')
-        self._attr._grouptype = event.get_key('grouptype')
-        self._attr._groupname = event.get_key('groupname')
+        self._attr._groupspknum = event.get_key("spknum")
+        self._attr._grouptype = event.get_key("grouptype")
+        self._attr._groupname = event.get_key("groupname")
         return True
 
     def event_MultispkGroupStartEvent(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'MultispkGroupStartEvent'
         type: (str): 'UIC'
@@ -1393,7 +1405,7 @@ class WamEvents:
         return False
 
     def event_MusicInfo(self, event: ApiResponse) -> bool:
-        """ Information about what is playing.
+        """Information about what is playing.
 
         This is for UIC, eg DLNA.
 
@@ -1443,16 +1455,21 @@ class WamEvents:
         # TODO: Is playbacktype=playlist an indication that next and previous is supported?
         # TODO: Is pause=enable an indication that pause is supported?
 
-        self._attr._album = event.get_key('album', self._attr._album)
-        self._attr._artist = event.get_key('artist', self._attr._artist)
-        self._attr._thumbnail = event.get_key('thumbnail', self._attr._thumbnail)
-        self._attr._title = event.get_key('title', self._attr._title)
+        self._attr._album = event.get_key("album", self._attr._album)
+        self._attr._artist = event.get_key("artist", self._attr._artist)
+        self._attr._thumbnail = event.get_key("thumbnail", self._attr._thumbnail)
+        self._attr._title = event.get_key("title", self._attr._title)
 
         # TODO: Doesn't comply with how we do other things. This should be done in the
         # attributes module.
-        timelength = str(event.get_key('timelength', '0')).replace('.', ':')
+        timelength = str(event.get_key("timelength", "0")).replace(".", ":")
         try:
-            tl = int(sum(x * int(t) for x, t in zip([3600, 60, 1, 0.001], timelength.split(":"))))
+            tl = int(
+                sum(
+                    x * int(t)
+                    for x, t in zip([3600, 60, 1, 0.001], timelength.split(":"))
+                )
+            )
         except Exception:
             tl = 0
         self._attr._tracklength = str(tl)
@@ -1460,7 +1477,7 @@ class WamEvents:
         return True
 
     def event_MusicList(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'MusicList'
         type: (str): 'UIC'
@@ -1496,7 +1513,7 @@ class WamEvents:
         return False
 
     def event_MusicPlayTime(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'MusicPlayTime'
         type: (str): 'UIC'
@@ -1512,7 +1529,7 @@ class WamEvents:
         return False
 
     def event_MuteStatus(self, event: ApiResponse) -> bool:
-        """ Mute state of the speaker.
+        """Mute state of the speaker.
 
         Sent when asked for (´GetMute´) or when changed (´SetMute´).
 
@@ -1528,11 +1545,11 @@ class WamEvents:
             mute(str):
                 'on'|'off' - 'on' if speaker is muted.
         """
-        self._attr._mute = event.get_key('mute')
+        self._attr._mute = event.get_key("mute")
         return True
 
     def event_PausePlaybackEvent(self, event: ApiResponse) -> bool:
-        """ Playback paused.
+        """Playback paused.
 
         Sometimes sent when pausing playback on the speaker.
 
@@ -1548,11 +1565,11 @@ class WamEvents:
             playtime(str):
                 Media position when paused.
         """
-        self._attr._playstatus = 'pause'
+        self._attr._playstatus = "pause"
         return True
 
     def event_PlayStatus(self, event: ApiResponse) -> bool:
-        """ Play status.
+        """Play status.
 
         method (str): 'PlayStatus'
         type: (str): 'CPM' | 'UIC'
@@ -1575,24 +1592,24 @@ class WamEvents:
         # Workaround for UrlPlayback
         # If the native app is started we need to ignore the attributes
         # if we are playing a url.
-        if event.get_key('cpname') == 'Unknown' and self._attr._submode == 'url':
+        if event.get_key("cpname") == "Unknown" and self._attr._submode == "url":
             return False
 
-        self._attr._playstatus = event.get_key('playstatus', self._attr._playstatus)
-        self._attr._function = event.get_key('function', self._attr._function)
-        self._attr._submode = event.get_key('submode', self._attr._submode)
+        self._attr._playstatus = event.get_key("playstatus", self._attr._playstatus)
+        self._attr._function = event.get_key("function", self._attr._function)
+        self._attr._submode = event.get_key("submode", self._attr._submode)
 
-        cpname = event.get_key('cpname')
+        cpname = event.get_key("cpname")
         if cpname != self._attr._cpname:
             self._attr.reset_media_info()
-            self._attr._function = 'wifi'
-            self._attr._submode = 'cp'
+            self._attr._function = "wifi"
+            self._attr._submode = "cp"
             self._attr._cpname = cpname
 
         return True
 
     def event_PlaybackStatus(self, event: ApiResponse) -> bool:
-        """ Playback status.
+        """Playback status.
 
         method (str): 'PlaybackStatus'
         type: (str): 'UIC' | 'CPM'
@@ -1618,24 +1635,24 @@ class WamEvents:
         # Workaround for UrlPlayback
         # If the native app is started we need to ignore the attributes
         # if we are playing a url.
-        if event.get_key('cpname') == 'Unknown' and self._attr._submode == 'url':
+        if event.get_key("cpname") == "Unknown" and self._attr._submode == "url":
             return False
 
-        self._attr._playstatus = event.get_key('playstatus', self._attr._playstatus)
-        self._attr._function = event.get_key('function', self._attr._function)
-        self._attr._submode = event.get_key('submode', self._attr._submode)
+        self._attr._playstatus = event.get_key("playstatus", self._attr._playstatus)
+        self._attr._function = event.get_key("function", self._attr._function)
+        self._attr._submode = event.get_key("submode", self._attr._submode)
 
-        cpname = event.get_key('cpname')
+        cpname = event.get_key("cpname")
         if cpname != self._attr._cpname:
             self._attr.reset_media_info()
-            self._attr._function = 'wifi'
-            self._attr._submode = 'cp'
+            self._attr._function = "wifi"
+            self._attr._submode = "cp"
             self._attr._cpname = cpname
 
         return True
 
     def event_PresetList(self, event: ApiResponse) -> bool:
-        """ Presets stored in speaker.
+        """Presets stored in speaker.
 
         List of presets stored on the speaker.
 
@@ -1677,16 +1694,16 @@ class WamEvents:
             totallistcount(str):
                 Number of presets returned.
         """
-        cpname = event.get_key('cpname')
+        cpname = event.get_key("cpname")
         if cpname:
-            presetlist = listify(event.get_subkey('presetlist', 'preset'))
+            presetlist = listify(event.get_subkey("presetlist", "preset"))
             if presetlist:
                 self._attr._media_presetlist[cpname] = presetlist
                 return True
         return False
 
     def event_QueryList(self, event: ApiResponse) -> bool:
-        """ Receive search result for TuneIn.
+        """Receive search result for TuneIn.
 
         method (str): 'QueryList'
         type: (str): 'CPM'
@@ -1718,7 +1735,7 @@ class WamEvents:
         return False
 
     def event_RadioInfo(self, event: ApiResponse) -> bool:
-        """ Information about what is playing.
+        """Information about what is playing.
 
         This is for CPM apps. (TuneIn, Spotify ...)
 
@@ -1766,28 +1783,28 @@ class WamEvents:
         # Workaround for UrlPlayback
         # If the native app is started we need to ignore the attributes
         # if we are playing a url.
-        if event.get_key('cpname') == 'Unknown' and self._attr._submode == 'url':
+        if event.get_key("cpname") == "Unknown" and self._attr._submode == "url":
             return False
 
-        cpname = event.get_key('cpname')
+        cpname = event.get_key("cpname")
         if cpname != self._attr._cpname:
             self._attr.reset_media_info()
-            self._attr._function = 'wifi'
-            self._attr._submode = 'cp'
+            self._attr._function = "wifi"
+            self._attr._submode = "cp"
             self._attr._cpname = cpname
 
-        self._attr._playstatus = event.get_key('playstatus', self._attr._playstatus)
-        self._attr._album = event.get_key('album', self._attr._album)
-        self._attr._artist = event.get_key('artist', self._attr._artist)
-        self._attr._description = event.get_key('description', self._attr._description)
-        self._attr._thumbnail = event.get_key('thumbnail', self._attr._thumbnail)
-        self._attr._title = event.get_key('title', self._attr._title)
-        self._attr._tracklength = event.get_key('tracklength', self._attr._tracklength)
+        self._attr._playstatus = event.get_key("playstatus", self._attr._playstatus)
+        self._attr._album = event.get_key("album", self._attr._album)
+        self._attr._artist = event.get_key("artist", self._attr._artist)
+        self._attr._description = event.get_key("description", self._attr._description)
+        self._attr._thumbnail = event.get_key("thumbnail", self._attr._thumbnail)
+        self._attr._title = event.get_key("title", self._attr._title)
+        self._attr._tracklength = event.get_key("tracklength", self._attr._tracklength)
 
         return True
 
     def event_RadioList(self, event: ApiResponse) -> bool:
-        """ When browsing TuneIn.
+        """When browsing TuneIn.
 
         method (str): 'RadioList'
         type: (str): 'CPM'
@@ -1839,7 +1856,7 @@ class WamEvents:
         return False
 
     def event_RadioSelected(self, event: ApiResponse) -> bool:
-        """ Radio (TuneIn) is selected.
+        """Radio (TuneIn) is selected.
 
         This event has no speaker state attributes!
 
@@ -1875,7 +1892,7 @@ class WamEvents:
         return False
 
     def event_RepeatMode(self, event: ApiResponse) -> bool:
-        """ Repeat mode.
+        """Repeat mode.
 
         method (str): 'RepeatMode'
         type: (str): 'UIC'
@@ -1890,11 +1907,11 @@ class WamEvents:
                 'one'|'all'|'off' for repeat one track, all tracks
                 on the playlist, or disabled repeat mode.
         """
-        self._attr._repeat = event.get_key('repeat')
+        self._attr._repeat = event.get_key("repeat")
         return True
 
     def event_RequestDeviceInfo(self, event: ApiResponse) -> bool:
-        """ Empty message.
+        """Empty message.
 
         Sent as first repsonse to API call ´GetMainInfo´.
 
@@ -1909,7 +1926,7 @@ class WamEvents:
         return False
 
     def event_Reset7bandEQValue(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'Reset7bandEQValue'
         type: (str): 'UIC'
@@ -1931,7 +1948,7 @@ class WamEvents:
         return False
 
     def event_SavePreset(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'SavePreset'
         type: (str): 'CPM'
@@ -1951,7 +1968,7 @@ class WamEvents:
         return False
 
     def event_SelectCpService(self, event: ApiResponse) -> bool:
-        """ Set selected cp service.
+        """Set selected cp service.
 
         - Seems to be emitted when apps other than TuneIn is selected
           for browsing. Has nothing to do with what is playing.
@@ -1976,14 +1993,14 @@ class WamEvents:
             timestamp(str, optional):
                 UTC ISO 8601 format (eg '2020-02-19T17:26:24Z')
         """
-        if event.get_key('cpname') == self._attr._cpname:
-            if event.get_key('signinstatus') == '0':
+        if event.get_key("cpname") == self._attr._cpname:
+            if event.get_key("signinstatus") == "0":
                 self._attr.reset_media_info()
             return True
         return False
 
     def event_ShuffleMode(self, event: ApiResponse) -> bool:
-        """ Shuffle mode.
+        """Shuffle mode.
 
         method (str): 'ShuffleMode'
         type: (str): 'UIC'
@@ -1997,11 +2014,11 @@ class WamEvents:
             shuffle(str):
                 'on'|'off'
         """
-        self._attr._shuffle = event.get_key('shuffle')
+        self._attr._shuffle = event.get_key("shuffle")
         return True
 
     def event_SleepTime(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'SleepTime'
         type: (str): 'UIC'
@@ -2017,7 +2034,7 @@ class WamEvents:
         return False
 
     def event_SoftwareVersion(self, event: ApiResponse) -> bool:
-        """ Firmware version on speaker.
+        """Firmware version on speaker.
 
         method (str): 'SoftwareVersion'
         type: (str): 'UIC'
@@ -2033,11 +2050,11 @@ class WamEvents:
             version(str):
                 Version of firmware
         """
-        self._attr._displayversion = event.get_key('displayversion')
+        self._attr._displayversion = event.get_key("displayversion")
         return True
 
     def event_SpeakerBuyer(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'SpeakerBuyer'
         type: (str): 'UIC'
@@ -2052,7 +2069,7 @@ class WamEvents:
         return False
 
     def event_SpeakerTime(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'SpeakerTime'
         type: (str): 'UIC'
@@ -2072,7 +2089,7 @@ class WamEvents:
         return False
 
     def event_SpeakerWifiRegion(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'SpeakerWifiRegion'
         type: (str): 'UIC'
@@ -2087,7 +2104,7 @@ class WamEvents:
         return False
 
     def event_SpkName(self, event: ApiResponse) -> bool:
-        """ Speaker name.
+        """Speaker name.
 
         Sent when speaker name is asked for (´GetSpkName´)
         or changed (´SetSpkName´).
@@ -2104,11 +2121,11 @@ class WamEvents:
             spkname(str):
                 Name of the speaker
         """
-        self._attr._spkname = event.get_key('spkname')
+        self._attr._spkname = event.get_key("spkname")
         return True
 
     def event_StartPlaybackEvent(self, event: ApiResponse) -> bool:
-        """ Start playback.
+        """Start playback.
 
         Sent when starting playback on the speaker.
 
@@ -2124,11 +2141,11 @@ class WamEvents:
             playtime(str):
                 ?
         """
-        self._attr._playstatus = 'play'
+        self._attr._playstatus = "play"
         return True
 
     def event_StationData(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'StationData'
         type: (str): 'CPM'
@@ -2150,7 +2167,7 @@ class WamEvents:
         return False
 
     def event_StopPlaybackEvent(self, event: ApiResponse) -> bool:
-        """ Stop playback.
+        """Stop playback.
 
         Sometimes sent when stopping playback on the speaker.
 
@@ -2166,11 +2183,11 @@ class WamEvents:
             playtime(str):
                 ?
         """
-        self._attr._playstatus = 'stop'
+        self._attr._playstatus = "stop"
         return True
 
     def event_SubSoftwareVersion(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'SubSoftwareVersion'
         type: (str): 'UIC'
@@ -2189,7 +2206,7 @@ class WamEvents:
         return False
 
     def event_Ungroup(self, event: ApiResponse) -> bool:
-        """ Speaker is ungrouped.
+        """Speaker is ungrouped.
 
         Sent when a a group is cancelled.
 
@@ -2203,16 +2220,16 @@ class WamEvents:
             @result(str):
                 'ok' | 'ng'
         """
-        self._attr._groupmainip = '0.0.0.0'
-        self._attr._groupmainmacaddr = '00:00:00:00:00:00'
-        self._attr._groupspknum = '0'
-        self._attr._grouptype = 'N'
-        self._attr._groupname = ''
+        self._attr._groupmainip = "0.0.0.0"
+        self._attr._groupmainmacaddr = "00:00:00:00:00:00"
+        self._attr._groupspknum = "0"
+        self._attr._grouptype = "N"
+        self._attr._groupname = ""
 
         return True
 
     def event_UniversalSearchMusicList(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'UniversalSearchMusicList'
         type: (str): 'UIC'
@@ -2262,7 +2279,7 @@ class WamEvents:
         return False
 
     def event_UrlPlayback(self, event: ApiResponse) -> bool:
-        """ Url playing.
+        """Url playing.
 
         method (str): 'UrlPlayback'
         type: (str): 'UIC'
@@ -2280,14 +2297,14 @@ class WamEvents:
         """
         self._attr.reset_source_info()
         self._attr.reset_media_info()
-        self._attr._function = 'wifi'
-        self._attr._submode = 'url'
-        self._attr._playstatus = 'play'
-        self._attr._cpname = 'Unknown'
+        self._attr._function = "wifi"
+        self._attr._submode = "url"
+        self._attr._playstatus = "play"
+        self._attr._cpname = "Unknown"
         return True
 
     def event_ValidAppVersion(self, event: ApiResponse) -> bool:
-        """ ????.
+        """????.
 
         method (str): 'ValidAppVersion'
         type: (str): 'UIC'
@@ -2303,7 +2320,7 @@ class WamEvents:
         return False
 
     def event_VolumeLevel(self, event: ApiResponse) -> bool:
-        """ Speaker volume level.
+        """Speaker volume level.
 
         Sent when asked (´GetVolume´) for or
         when volume is changed (´SetVolume´).
@@ -2320,5 +2337,5 @@ class WamEvents:
             volume(str):
                 Speaker volume between 0 and 30.
         """
-        self._attr._volume = event.get_key('volume')
+        self._attr._volume = event.get_key("volume")
         return True
