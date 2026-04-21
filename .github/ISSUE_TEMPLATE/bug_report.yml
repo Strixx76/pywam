@@ -1,0 +1,24 @@
+name: Bug report
+description: Report an bug/issue with the pywam package.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Bug report
+        **This issue form is for reporting bugs only**
+        If you have a feature or enhancement request, please use the feature request form.
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: The problem
+      description: Describe the issue you are experiencing here.
+  - type: markdown
+    attributes:
+      value: |
+        # Details
+  - type: textarea
+    attributes:
+      label: Debug log
+      description: Please add debug logs with both API calls and responses.
+      render: text

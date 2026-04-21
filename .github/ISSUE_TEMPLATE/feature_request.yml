@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest a new feature.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Feature request
+        **This issue form is for requesting new features or enhancements**
+        If you have found a bug, please use the bug report form.
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Description
+      description:  >-
+        Describe the feature your missing or enhancement you would like to see.
+  - type: markdown
+    attributes:
+      value: |
+        # Details
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: Reason
+      description:  >-
+        What is the reason for suggesting this?
+  - type: textarea
+    attributes:
+      label: Additional information
+      description:  >-
+        If you have any additional information, use the field below.
