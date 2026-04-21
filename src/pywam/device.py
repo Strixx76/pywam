@@ -453,7 +453,7 @@ class WamDevice:
         )
         factor = max_api / 100
         vol = int(volume * factor)
-        return min(max(vol, 0), self._device_info.max_api_volume)
+        return min(max(vol, 0), max_api)
 
     def decode_volume(self, volume: int, max_volume: str | None) -> int:
         """Translate volume to user value."""
