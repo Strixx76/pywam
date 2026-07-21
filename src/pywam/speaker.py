@@ -24,7 +24,12 @@ from pywam.lib.const import (
     Feature,
 )
 from pywam.lib.equalizer import EqualizerPreset
-from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError, PywamError
+from pywam.lib.exceptions import (
+    ApiCallError,
+    ApiCallTimeoutError,
+    FeatureNotSupportedError,
+    PywamError,
+)
 
 if TYPE_CHECKING:
     from pywam.lib.api_response import ApiResponse
@@ -82,6 +87,10 @@ class Speaker:
         self.attribute = WamAttributes(self, self.device)
         self.events = WamEvents(self)
         self.client = WamClient(self)
+        # (source, api-method) pairs the speaker doesn't answer — player/radio
+        # queries are meaningless in an external input like HDMI, but valid in
+        # Wi-Fi/Bluetooth. Keyed by source so a source change re-enables them.
+        self._unsupported: set[tuple[str | None, str]] = set()
 
     async def __aenter__(self):
         """Enter async context manager."""
@@ -414,6 +423,35 @@ class Speaker:
     # Update
     # ******************************************************************
 
+    async def _update_optional(self, call: api_call.ApiCall) -> None:
+        """Request an attribute that only some sources expose.
+
+        Player/radio queries (shuffle, repeat, preset list) are meaningless
+        when the active source is an external input (e.g. HDMI on a soundbar),
+        where the speaker simply doesn't answer them and one unanswered call
+        would otherwise abort the whole update(). Skip such a call once it has
+        timed out for the CURRENT source — but key it to that source, so
+        switching to a source that does support it (Wi-Fi / Bluetooth playback)
+        re-enables the query on the next update rather than nerfing it for the
+        life of the connection.
+
+        NB: relies on get_func() being requested before the optional calls in
+        update_player_info(), so self.attribute._function is current.
+        """
+        key = (self.attribute._function, call.method)
+        if key in self._unsupported:
+            return
+        try:
+            await self.client.request(call)
+        except ApiCallTimeoutError:
+            _LOGGER.debug(
+                "Speaker did not answer '%s' in source '%s'; skipping it for "
+                "that source until the source changes.",
+                call.method,
+                self.attribute._function,
+            )
+            self._unsupported.add(key)
+
     async def update(self) -> None:
         """Update all speaker properties.
 
@@ -453,8 +491,8 @@ class Speaker:
         await self.client.request(api_call.get_func())
         await self.client.request(api_call.get_volume())
         await self.client.request(api_call.get_mute())
-        await self.client.request(api_call.get_shuffle_mode())
-        await self.client.request(api_call.get_repeat_mode())
+        await self._update_optional(api_call.get_shuffle_mode())
+        await self._update_optional(api_call.get_repeat_mode())
         await self.client.request(api_call.get_current_eq_mode())
 
     async def update_media_info(self) -> None:
@@ -467,8 +505,10 @@ class Speaker:
     async def update_speaker_settings(self) -> None:
         """Update speaker settings."""
         # Favorites. At the moment only TuneIn presets are supported.
-        await self.client.request(api_call.set_select_radio())
-        await self.client.request(api_call.get_preset_list(0, 30))
+        # These don't apply when the active source isn't a radio/player
+        # (e.g. a soundbar in an HDMI source), so tolerate no answer.
+        await self._update_optional(api_call.set_select_radio())
+        await self._update_optional(api_call.get_preset_list(0, 30))
         # Equalizer
         await self.client.request(api_call.get_7band_eq_list())
 
