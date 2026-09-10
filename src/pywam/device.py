@@ -366,6 +366,7 @@ SPEAKER_MODELS: dict[str, dict[str, Any]] = {
             "Optical",
             "TV SoundConnect",
         ],
+        "port": 56001
     },
     "HW-Q96R": {
         "name": "HW-Q96R 7.1.4ch Dolby Atmos Soundbar",
