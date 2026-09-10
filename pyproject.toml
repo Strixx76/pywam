@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=78.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "pywam"
@@ -22,3 +22,9 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://www.github.com/Strixx76/pywam"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pywam"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/pyproject.toml", "/README.md", "/CHANGELOG.md", "/LICENSE.txt", "/src/pywam"]
