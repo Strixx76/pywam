@@ -450,12 +450,13 @@ class Speaker:
 
     async def update_player_info(self) -> None:
         """Update player attributes."""
-        await self.client.request(api_call.get_func())
         await self.client.request(api_call.get_volume())
         await self.client.request(api_call.get_mute())
-        await self.client.request(api_call.get_shuffle_mode())
-        await self.client.request(api_call.get_repeat_mode())
         await self.client.request(api_call.get_current_eq_mode())
+        await self.client.request(api_call.get_func())
+        if self.attribute._function == "wifi" and self.attribute._submode == "dlna":
+            await self.client.request(api_call.get_shuffle_mode())
+            await self.client.request(api_call.get_repeat_mode())
 
     async def update_media_info(self) -> None:
         """Update current media attributes."""
