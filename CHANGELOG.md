@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2026-09-10
+
+- Only ask for shuffle and repeat mode when source is WiFi and app is DLNA.
+- Changed default port for HW-Q90R to 56001.
+
 ## [0.2.1b3] - 2026-04-21
 
 - Implementing GetGeature API call to support different max volumes.
@@ -66,3 +71,4 @@ with that integration, but that project has set the requirements to pywam>=0.0.1
 [0.1.0rc6]: https://github.com/Strixx76/pywam/tree/v0.1.0rc6
 [0.2.0]: https://github.com/Strixx76/pywam/tree/v0.2.0
 [0.2.1b3]: https://github.com/Strixx76/pywam/tree/v0.2.1b3
+[0.2.2]: https://github.com/Strixx76/pywam/tree/v0.2.2

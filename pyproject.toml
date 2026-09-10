@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pywam"
-version = "0.2.1b3"
+version = "0.2.2"
 description = "Library built on AsyncIO for communicating with Samsung Wireless Audio speakers (WAM)."
 license = { text = "MIT License" }
 readme = "README.md"
