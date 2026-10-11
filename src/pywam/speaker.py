@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import functools
 import logging
 from typing import TYPE_CHECKING
@@ -25,6 +26,7 @@ from pywam.lib.const import (
 )
 from pywam.lib.equalizer import EqualizerPreset
 from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError, PywamError
+
 
 if TYPE_CHECKING:
     from pywam.lib.api_response import ApiResponse
@@ -468,10 +470,13 @@ class Speaker:
     async def update_speaker_settings(self) -> None:
         """Update speaker settings."""
         # Favorites. At the moment only TuneIn presets are supported.
-        await self.client.request(api_call.set_select_radio())
-        await self.client.request(api_call.get_preset_list(0, 30))
+        with contextlib.suppress(BaseException):  # Not all speakers support this.
+            resp = await self.client.request(api_call.set_select_radio())
+            if resp.success:
+                await self.client.request(api_call.get_preset_list(0, 30))
         # Equalizer
-        await self.client.request(api_call.get_7band_eq_list())
+        with contextlib.suppress(BaseException):  # Not all speakers support this.
+            await self.client.request(api_call.get_7band_eq_list())
 
     # ******************************************************************
     # Get
