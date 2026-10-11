@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2026-10-11
+
+- Ignore errors for API calls that not all speakers support at Speaker.update()
+
 ## [0.2.2] - 2026-09-10
 
 - Only ask for shuffle and repeat mode when source is WiFi and app is DLNA.
@@ -72,3 +76,4 @@ with that integration, but that project has set the requirements to pywam>=0.0.1
 [0.2.0]: https://github.com/Strixx76/pywam/tree/v0.2.0
 [0.2.1b3]: https://github.com/Strixx76/pywam/tree/v0.2.1b3
 [0.2.2]: https://github.com/Strixx76/pywam/tree/v0.2.2
+[0.2.3]: https://github.com/Strixx76/pywam/tree/v0.2.3
