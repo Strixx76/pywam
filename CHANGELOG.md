@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.4] - 2026-10-17
+
+- Remember DLNA shuffle/repeat timeouts per source so unsupported optional queries do not abort updates.
+- Add the Samsung AKG VL3 (WAH-VL350) model name and observed sources.
+
 ## [0.2.3] - 2026-10-11
 
 - Ignore errors for API calls that not all speakers support at Speaker.update()
@@ -77,3 +82,4 @@ with that integration, but that project has set the requirements to pywam>=0.0.1
 [0.2.1b3]: https://github.com/Strixx76/pywam/tree/v0.2.1b3
 [0.2.2]: https://github.com/Strixx76/pywam/tree/v0.2.2
 [0.2.3]: https://github.com/Strixx76/pywam/tree/v0.2.3
+[0.2.4]: https://github.com/Mrgove10/pywam/tree/v0.2.4

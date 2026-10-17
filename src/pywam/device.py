@@ -99,6 +99,11 @@ SPEAKER_MODELS: dict[str, dict[str, Any]] = {
         ],
         "master_sources": ["Wi-Fi", "AUX", "Optical", "Coaxial"],
     },
+    # Model string and name confirmed by a user; controls not fully tested.
+    "WAH-VL350": {
+        "name": "VL3",
+        "sources": ["Bluetooth", "Wi-Fi"],
+    },
     # Not tested or confirmed.
     "HW-H750": {
         "name": "4.1 Ch Soundbar H750",

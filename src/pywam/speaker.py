@@ -25,10 +25,16 @@ from pywam.lib.const import (
     Feature,
 )
 from pywam.lib.equalizer import EqualizerPreset
-from pywam.lib.exceptions import ApiCallError, FeatureNotSupportedError, PywamError
+from pywam.lib.exceptions import (
+    ApiCallError,
+    ApiCallTimeoutError,
+    FeatureNotSupportedError,
+    PywamError,
+)
 
 
 if TYPE_CHECKING:
+    from pywam.lib.api_call import ApiCall
     from pywam.lib.api_response import ApiResponse
     from pywam.lib.media_presets import MediaPreset
     from pywam.lib.url import UrlMediaItem
@@ -84,6 +90,9 @@ class Speaker:
         self.attribute = WamAttributes(self, self.device)
         self.events = WamEvents(self)
         self.client = WamClient(self)
+        self._unsupported_optional_calls: set[
+            tuple[str | None, str | None, str]
+        ] = set()
 
     async def __aenter__(self):
         """Enter async context manager."""
@@ -457,8 +466,30 @@ class Speaker:
         await self.client.request(api_call.get_current_eq_mode())
         await self.client.request(api_call.get_func())
         if self.attribute._function == "wifi" and self.attribute._submode == "dlna":
-            await self.client.request(api_call.get_shuffle_mode())
-            await self.client.request(api_call.get_repeat_mode())
+            await self._update_optional(api_call.get_shuffle_mode())
+            await self._update_optional(api_call.get_repeat_mode())
+
+    async def _update_optional(self, call: ApiCall) -> None:
+        """Update an optional attribute, remembering unsupported calls per source."""
+        source_call = (
+            self.attribute._function,
+            self.attribute._submode,
+            call.method,
+        )
+        if source_call in self._unsupported_optional_calls:
+            return
+
+        try:
+            await self.client.request(call)
+        except ApiCallTimeoutError:
+            self._unsupported_optional_calls.add(source_call)
+            _LOGGER.debug(
+                "%s does not support %s in source %s/%s",
+                self.ip,
+                call.method,
+                self.attribute._function,
+                self.attribute._submode,
+            )
 
     async def update_media_info(self) -> None:
         """Update current media attributes."""
