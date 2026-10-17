@@ -39,6 +39,20 @@ class TestOptionalUpdate(unittest.IsolatedAsyncioTestCase):
         with self.assertRaisesRegex(ApiCallTimeoutError, "required query failed"):
             await speaker.update_player_info()
 
+    async def test_music_info_timeout_is_remembered_for_dlna_source(self) -> None:
+        speaker = Speaker("192.0.2.1")
+        speaker.attribute._function = "wifi"
+        speaker.attribute._submode = "dlna"
+        speaker.client.request = AsyncMock(
+            side_effect=ApiCallTimeoutError("unsupported query")
+        )
+
+        await speaker.update_media_info()
+        await speaker.update_media_info()
+
+        methods = [call.args[0].method for call in speaker.client.request.call_args_list]
+        self.assertEqual(methods.count("GetMusicInfo"), 1)
+
     def test_vl350_model_name_and_sources(self) -> None:
         info = get_device_info("WAH-VL350")
 

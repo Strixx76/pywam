@@ -496,7 +496,7 @@ class Speaker:
         if self.attribute._function == "wifi" and self.attribute._submode == "cp":
             await self.client.request(api_call.get_radio_info())
         elif self.attribute._function == "wifi" and self.attribute._submode == "dlna":
-            await self.client.request(api_call.get_music_info())
+            await self._update_optional(api_call.get_music_info())
 
     async def update_speaker_settings(self) -> None:
         """Update speaker settings."""
